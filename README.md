@@ -33,6 +33,10 @@ We don't need the builder image anymore, to delete it, do:
          --volume /dev/shm /dev/shm --network=host -- osrf/ros:noetic-desktop \
          'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
 ```
+You may need to install rocker first:
+``` bash
+  sudo apt install python3-rocker
+```
 
 ###  2.) Then, start "roscore" inside the ROS1 Noetic docker container
 
