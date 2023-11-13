@@ -3,11 +3,11 @@ FROM osrf/ros:humble-desktop
 # How to build this docker image:
 #  docker build . -t ros-humble-ros1-bridge-builder
 #
-# How to build ros1_humble_bridge:
-#  # 0.) Start from the ROS 2 Humble system, build a "ros1_humble_bridge/" ROS2 package:
+# How to build ros-humble-ros1-bridge:
+#  # 0.) Start from the ROS 2 Humble system, build a "ros-humble-ros1-bridge/" ROS2 package:
 #  docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 #
-# How to use ros1_humble_bridge:
+# How to use ros-humble-ros1-bridge:
 #  # 1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
 #  rocker --x11 --user --home --privileged \
 #         --volume /dev/shm /dev/shm --network=host -- osrf/ros:noetic-desktop \
@@ -19,7 +19,7 @@ FROM osrf/ros:humble-desktop
 #
 #  # 3.) Now, from the ROS2 Humble system, start the ros1 bridge node.
 #  source /opt/ros/humble/setup.bash
-#  source ros1_humble_bridge/install/setup.bash
+#  source ros-humble-ros1-bridge/install/setup.bash
 #  ros2 run ros1_bridge dynamic_bridge
 #
 #  # 3.) Back to the ROS1 Noetic docker container, run in another terminal tab:
@@ -60,8 +60,8 @@ RUN apt update
 
 # 6.) compile ros1_bridge (Takes about 6 minutes on a 6-core PC)
 # ref: https://github.com/ros2/ros1_bridge/issues/391
-RUN mkdir -p /ros1_humble_bridge/src && \
-    cd /ros1_humble_bridge/src && \
+RUN mkdir -p /ros-humble-ros1-bridge/src && \
+    cd /ros-humble-ros1-bridge/src && \
     git clone https://github.com/ros2/ros1_bridge &&\
     cd ros1_bridge/ && \
     git checkout b9f1739 && \
@@ -86,15 +86,15 @@ RUN ROS1_LIBS="libxmlrpcpp.so"; \
     ROS1_LIBS="$ROS1_LIBS libb64.so"; \
     ROS1_LIBS="$ROS1_LIBS libaprutil-1.so"; \
     ROS1_LIBS="$ROS1_LIBS libapr-1.so"; \
-    cd /ros1_humble_bridge/install/ros1_bridge/lib; \
+    cd /ros-humble-ros1-bridge/install/ros1_bridge/lib; \
     for soFile in $ROS1_LIBS; do \
         ldd libros1_bridge.so | grep $soFile | \
             awk '{print $3;}' | xargs cp -t ./  ; \
     done
 
 # 9.) Spit out ros1_bridge tarball by default when no command is given
-RUN tar czf /ros1_humble_bridge.tgz /ros1_humble_bridge 
-CMD cat /ros1_humble_bridge.tgz
+RUN tar czf /ros-humble-ros1-bridge.tgz /ros-humble-ros1-bridge 
+CMD cat /ros-humble-ros1-bridge.tgz
 
 
 

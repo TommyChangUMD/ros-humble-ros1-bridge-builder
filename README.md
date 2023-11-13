@@ -5,20 +5,27 @@ directly in ROS2 Humble.
 It takes only 10 minutes.
 
 
-## How to build this docker image:
+## How to create this builder docker image:
 
 ``` bash
   docker build . -t ros-humble-ros1-bridge-builder
 ```
 
-## How to build ros1_humble_bridge:
-###  0.) Start from the ROS 2 Humble system, build a "ros1_humble_bridge/" ROS2 package:
+## How to create ros-humble-ros1-bridge package:
+###  0.) Start from the ROS 2 Humble system, build a "ros-humble-ros1-bridge/" ROS2 package:
 
 ``` bash
-  docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
+    cd ~/
+    docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 ```
 
-## How to use ros1_humble_bridge:
+We don't need the builder image anymore, to delete it, do:
+
+``` bash
+    docker rmi ros-humble-ros1-bridge-builder
+```
+
+## How to use ros-humble-ros1-bridge:
 ###  1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
 
 ``` bash
@@ -27,7 +34,7 @@ It takes only 10 minutes.
          'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
 ```
 
-###  2.) Then, start "roscore" inside the ROS1 docker
+###  2.) Then, start "roscore" inside the ROS1 Noetic docker container
 
 ``` bash
   source /opt/ros/noetic/setup.bash
@@ -38,7 +45,7 @@ It takes only 10 minutes.
 
 ``` bash
   source /opt/ros/humble/setup.bash
-  source ros1_humble_bridge/install/setup.bash
+  source ~/ros-humble-ros1-bridge/install/setup.bash
   ros2 run ros1_bridge dynamic_bridge
 ```
 
@@ -56,3 +63,8 @@ It takes only 10 minutes.
   ros2 run demo_nodes_cpp listener
 ```
 
+
+## References
+- https://github.com/ros2/ros1_bridge
+- https://github.com/mjforan/ros-humble-ros1-bridge
+- https://github.com/ros2/ros1_bridge/issues/391
