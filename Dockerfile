@@ -31,8 +31,8 @@ FROM osrf/ros:humble-desktop
 #  ros2 run demo_nodes_cpp listener
 #
 
-# Make sure we are using bash
-SHELL ["/bin/bash", "-c"]
+# Make sure we are using bash and catch errors
+SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-c"]
 
 # 1.) Temporarly remove ROS2 apt repository
 RUN mv /etc/apt/sources.list.d/ros2-latest.list /root/
@@ -88,8 +88,8 @@ RUN ROS1_LIBS="libxmlrpcpp.so"; \
     ROS1_LIBS="$ROS1_LIBS libapr-1.so"; \
     cd /ros-humble-ros1-bridge/install/ros1_bridge/lib; \
     for soFile in $ROS1_LIBS; do \
-        ldd libros1_bridge.so | grep $soFile | \
-            awk '{print $3;}' | xargs cp -t ./  ; \
+        soFilePath=$(ldd libros1_bridge.so | grep $soFile | awk '{print $3;}'); \
+        cp $soFilePath ./; \
     done
 
 # 9.) Spit out ros1_bridge tarball by default when no command is given
