@@ -19,7 +19,7 @@ FROM osrf/ros:humble-desktop
 #
 #  # 3.) Now, from the ROS2 Humble system, start the ros1 bridge node.
 #  source /opt/ros/humble/setup.bash
-#  source ros-humble-ros1-bridge/install/setup.bash
+#  source ros-humble-ros1-bridge/install/local_setup.bash
 #  ros2 run ros1_bridge dynamic_bridge
 #
 #  # 3.) Back to the ROS1 Noetic docker container, run in another terminal tab:
@@ -58,22 +58,30 @@ RUN apt -y install ros-core-dev
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
 RUN apt update
 
+# 5.1) Add ROS1 ros_tutorials messages and services
+RUN git clone https://github.com/ros/ros_tutorials.git &&\
+    cd ros_tutorials &&\
+    git checkout noetic-devel &&\
+    unset ROS_DISTRO &&\
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+
 # 6.) compile ros1_bridge (Takes about 6 minutes on a 6-core PC)
 # ref: https://github.com/ros2/ros1_bridge/issues/391
-RUN mkdir -p /ros-humble-ros1-bridge/src && \
+RUN source ros_tutorials/install/local_setup.bash && \
+    source /opt/ros/humble/setup.bash  && \
+    mkdir -p /ros-humble-ros1-bridge/src && \
     cd /ros-humble-ros1-bridge/src && \
     git clone https://github.com/ros2/ros1_bridge &&\
     cd ros1_bridge/ && \
     git checkout b9f1739 && \
     cd ../.. && \
-    source /opt/ros/humble/setup.bash  && \
     echo "Plase wait...  it takes about 10 minutes to build ros1_bridge" && \
     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # 7.) Clean up
 RUN apt -y clean all; apt -y update
 
-# 8.) Pack all dependent libraries
+# 8.) Pack all ROS1 dependent libraries
 RUN ROS1_LIBS="libxmlrpcpp.so"; \
     ROS1_LIBS="$ROS1_LIBS librostime.so"; \
     ROS1_LIBS="$ROS1_LIBS libroscpp.so"; \

@@ -50,12 +50,8 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
 
 ``` bash
   source /opt/ros/humble/setup.bash
-  source ~/ros-humble-ros1-bridge/install/setup.bash
+  source ~/ros-humble-ros1-bridge/install/local_setup.bash
   ros2 run ros1_bridge dynamic_bridge
-```
-Note: If you get error like: `error while loading shared libraries: XXX.so: cannot open shared object file: No such file or directory`, make sure you have all ROS2 humble packages installed.  For example:  
-```bash
-sudo apt install ros-humble-desktop
 ```
 
 ###  3.) Back to the ROS1 Noetic docker container, run in another terminal tab:
@@ -71,6 +67,7 @@ sudo apt install ros-humble-desktop
   source /opt/ros/humble/setup.bash
   ros2 run demo_nodes_cpp listener
 ```
+
 
 ## References
 - https://github.com/ros2/ros1_bridge
