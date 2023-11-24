@@ -103,5 +103,5 @@ RUN ROS1_LIBS="libxmlrpcpp.so"; \
 # 9.) Spit out ros1_bridge tarball by default when no command is given
 RUN tar czf /ros-humble-ros1-bridge.tgz \
     --exclude '*/build/*' --exclude '*/src/*' /ros-humble-ros1-bridge 
-ENTRYPOINT
+ENTRYPOINT []
 CMD cat /ros-humble-ros1-bridge.tgz
