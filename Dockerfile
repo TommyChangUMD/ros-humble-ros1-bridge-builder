@@ -76,7 +76,7 @@ RUN source ros_tutorials/install/local_setup.bash && \
     git checkout b9f1739 && \
     cd ../.. && \
     echo "Plase wait...  it takes about 10 minutes to build ros1_bridge" && \
-    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+    time colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # 7.) Clean up
 RUN apt -y clean all; apt -y update
