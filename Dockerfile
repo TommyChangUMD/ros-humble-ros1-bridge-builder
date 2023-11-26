@@ -31,14 +31,14 @@ FROM osrf/ros:humble-desktop
 #  ros2 run demo_nodes_cpp listener
 #
 
-# Make sure we are using bash and catch errors
+# Make sure we are using bash and catching errors
 SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-c"]
 
-# 1.) Temporarly remove ROS2 apt repository
+# 1.) Temporarily remove ROS2 apt repository
 RUN mv /etc/apt/sources.list.d/ros2-latest.list /root/
 RUN apt update
 
-# 2.) comment out the catkin confclit
+# 2.) comment out the catkin conflict
 RUN sed  -i -e 's|^Conflicts: catkin|#Conflicts: catkin|' /var/lib/dpkg/status
 RUN apt install -f
 
@@ -51,21 +51,22 @@ RUN dpkg --force-overwrite -i python3-rospkg*.deb
 RUN dpkg --force-overwrite -i python3-rosdistro*.deb
 RUN apt install -f
 
-# 4.) install ROS1 stuff
+# 4.) Install ROS1 stuff
+# see https://packages.ubuntu.com/jammy/ros-core-dev
 RUN apt -y install ros-core-dev
 
-# 5.) restore the ROS2 apt repos (optional)
+# 5.) Restore the ROS2 apt repos (optional)
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
 RUN apt update
 
-# 5.1) Add ROS1 ros_tutorials messages and services
-RUN git clone https://github.com/ros/ros_tutorials.git &&\
-    cd ros_tutorials &&\
-    git checkout noetic-devel &&\
-    unset ROS_DISTRO &&\
+# 5.1) Add additional ROS1 ros_tutorials messages and services
+RUN git clone https://github.com/ros/ros_tutorials.git && \
+    cd ros_tutorials && \
+    git checkout noetic-devel && \
+    unset ROS_DISTRO && \
     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-# 6.) compile ros1_bridge (Takes about 6 minutes on a 6-core PC)
+# 6.) Compile ros1_bridge
 # ref: https://github.com/ros2/ros1_bridge/issues/391
 RUN source ros_tutorials/install/local_setup.bash && \
     source /opt/ros/humble/setup.bash  && \
@@ -75,7 +76,7 @@ RUN source ros_tutorials/install/local_setup.bash && \
     cd ros1_bridge/ && \
     git checkout b9f1739 && \
     cd ../.. && \
-    echo "Plase wait...  it takes about 10 minutes to build ros1_bridge" && \
+    echo "Please wait...  it takes about 10 minutes to build ros1_bridge" && \
     time colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # 7.) Clean up
