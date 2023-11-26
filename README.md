@@ -1,11 +1,12 @@
 # ros-humble-ros1-bridge-builder
-Create the "*ros-humble-ros1-bridge*" package that can be used directly within Ubuntu 22.02 ROS2 Humble.  
+Create a "*ros-humble-ros1-bridge*" package that can be used directly within Ubuntu 22.02 ROS2 Humble.
 
-It takes about 10 minutes on my 6-core PC.
+It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB of memory.
 
 ## How to create this builder docker image:
 
 ``` bash
+  cd ~/
   docker build . -t ros-humble-ros1-bridge-builder
 ```
 
