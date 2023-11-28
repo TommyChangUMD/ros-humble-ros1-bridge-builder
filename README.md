@@ -11,7 +11,7 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB 
 ```
 
 ## How to create ros-humble-ros1-bridge package:
-###  0.) Start from the ROS 2 Humble system, build a "ros-humble-ros1-bridge/" ROS2 package:
+###  0.) Start from the ROS 2 Humble system*, build a "ros-humble-ros1-bridge/" ROS2 package:
 
 ``` bash
     cd ~/
@@ -23,6 +23,8 @@ We don't need the builder image anymore, to delete it, do:
 ``` bash
     docker rmi ros-humble-ros1-bridge-builder
 ```
+
+*Note: Since building the docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
 
 ## How to use ros-humble-ros1-bridge:
 ###  1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
