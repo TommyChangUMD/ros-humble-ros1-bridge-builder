@@ -76,8 +76,11 @@ RUN source ros_tutorials/install/local_setup.bash && \
     cd ros1_bridge/ && \
     git checkout b9f1739 && \
     cd ../.. && \
-    echo "Please wait...  it takes about 10 minutes to build ros1_bridge" && \
-    time colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
+    MEMG=$(printf "%.0f" $(free -g | awk '/^Mem:/{print $2}')); \ 
+    NPROC=$(nproc);  MIN=$((MEMG<NPROC ? MEMG : NPROC)); \
+    echo "Please wait...  running $MIN concurrent jobs to build ros1_bridge" && \
+    time MAKEFLAGS="-j $MIN" colcon build --event-handlers console_direct+ \
+      --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # 7.) Clean up
 RUN apt -y clean all; apt -y update
