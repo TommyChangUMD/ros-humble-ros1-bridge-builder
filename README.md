@@ -55,6 +55,7 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
   source ~/ros-humble-ros1-bridge/install/local_setup.bash
   ros2 run ros1_bridge dynamic_bridge
 ```
+*Note: We need to source `local_setup.bash` and NOT `setup.bash` because the bridge was compiled in a docker container that may have different underlay locations.  Besides, we don't need to source these underlays in the host system again.
 
 ###  3.) Back to the ROS1 Noetic docker container, run in another terminal tab:
 
