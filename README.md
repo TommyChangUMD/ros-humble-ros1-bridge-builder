@@ -7,7 +7,7 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB 
 
 ``` bash
   git clone https://github.com/TommyChangUMD/ros-humble-ros1-bridge-builder.git
-  cd ~/ros-humble-ros1-bridge-builder
+  cd ros-humble-ros1-bridge-builder
   docker build . -t ros-humble-ros1-bridge-builder
 ```
 
