@@ -66,9 +66,18 @@ RUN git clone https://github.com/ros/ros_tutorials.git && \
     unset ROS_DISTRO && \
     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
+# 5.2) Add tf2 support
+RUN apt -y install libactionlib-dev
+RUN git clone https://github.com/ros/geometry2 && \
+    cd geometry2 && \
+    git checkout noetic-devel && \
+    unset ROS_DISTRO && \
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+
 # 6.) Compile ros1_bridge
 # ref: https://github.com/ros2/ros1_bridge/issues/391
 RUN source ros_tutorials/install/local_setup.bash && \
+    source geometry2/install/local_setup.bash && \
     source /opt/ros/humble/setup.bash  && \
     mkdir -p /ros-humble-ros1-bridge/src && \
     cd /ros-humble-ros1-bridge/src && \
