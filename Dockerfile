@@ -55,6 +55,11 @@ RUN apt install -f
 # see https://packages.ubuntu.com/jammy/ros-core-dev
 RUN apt -y install ros-core-dev
 
+#
+# 4.1) Install additional system packages
+RUN apt -y install g++-12 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
+
 # 5.) Restore the ROS2 apt repos (optional)
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
 RUN apt update
@@ -74,10 +79,22 @@ RUN git clone https://github.com/ros/geometry2 && \
     unset ROS_DISTRO && \
     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
+# 5.3) Add tf support
+RUN apt -y install libangles-dev
+RUN g++ --version
+RUN git clone https://github.com/ros/geometry && \
+    source geometry2/install/local_setup.bash && \
+    cd geometry && \
+    git checkout noetic-devel && \
+    unset ROS_DISTRO && \
+    sed -i -e 's|std=c++11|std=c++17|g' ./tf/CMakeLists.txt  && \
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release 
+
 # 6.) Compile ros1_bridge
 # ref: https://github.com/ros2/ros1_bridge/issues/391
 RUN source ros_tutorials/install/local_setup.bash && \
     source geometry2/install/local_setup.bash && \
+    source geometry/install/local_setup.bash && \
     source /opt/ros/humble/setup.bash  && \
     mkdir -p /ros-humble-ros1-bridge/src && \
     cd /ros-humble-ros1-bridge/src && \
