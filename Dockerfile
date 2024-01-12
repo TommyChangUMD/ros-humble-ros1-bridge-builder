@@ -34,6 +34,11 @@ FROM osrf/ros:humble-desktop
 # Make sure we are using bash and catching errors
 SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-c"]
 
+# 0.) Bring system up to the latest
+RUN apt -y update
+RUN apt -y upgrade
+
+
 # 1.) Temporarily remove ROS2 apt repository
 RUN mv /etc/apt/sources.list.d/ros2-latest.list /root/
 RUN apt update
@@ -62,14 +67,17 @@ RUN apt -y install g++-12 && \
 
 # 5.) Restore the ROS2 apt repos (optional)
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
-RUN apt update
+RUN apt -y update
+#RUN apt -y upgrade
 
 # 5.1) Add additional ROS1 ros_tutorials messages and services
 RUN git clone https://github.com/ros/ros_tutorials.git && \
     cd ros_tutorials && \
     git checkout noetic-devel && \
     unset ROS_DISTRO && \
-    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
+    colcon test --event-handlers console_direct+ && \
+    colcon test-result 
 
 # 5.2) Add tf2 support
 RUN apt -y install libactionlib-dev
@@ -78,17 +86,20 @@ RUN git clone https://github.com/ros/geometry2 && \
     git checkout noetic-devel && \
     unset ROS_DISTRO && \
     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+    # colcon test --event-handlers console_direct+ && \
+    # colcon test-result 
 
 # 5.3) Add tf support
 RUN apt -y install libangles-dev
 RUN g++ --version
-RUN git clone https://github.com/ros/geometry && \
+RUN git clone https://github.com/ros-o/geometry.git && \
     source geometry2/install/local_setup.bash && \
     cd geometry && \
-    git checkout noetic-devel && \
+    git checkout obese-devel && \
     unset ROS_DISTRO && \
-    sed -i -e 's|std=c++11|std=c++17|g' ./tf/CMakeLists.txt  && \
-    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release 
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
+    colcon test --event-handlers console_direct+ && \
+    colcon test-result 
 
 # 6.) Compile ros1_bridge
 # ref: https://github.com/ros2/ros1_bridge/issues/391
@@ -106,7 +117,9 @@ RUN source ros_tutorials/install/local_setup.bash && \
     NPROC=$(nproc);  MIN=$((MEMG<NPROC ? MEMG : NPROC)); \
     echo "Please wait...  running $MIN concurrent jobs to build ros1_bridge" && \
     time MAKEFLAGS="-j $MIN" colcon build --event-handlers console_direct+ \
-      --cmake-args -DCMAKE_BUILD_TYPE=Release
+      --cmake-args -DCMAKE_BUILD_TYPE=Release 
+    # colcon test --event-handlers console_direct+ && \
+    # colcon test-result 
 
 # 7.) Clean up
 RUN apt -y clean all; apt -y update
