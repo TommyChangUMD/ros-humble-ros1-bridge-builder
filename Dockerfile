@@ -62,8 +62,8 @@ RUN apt -y install ros-core-dev
 
 #
 # 4.1) Install additional system packages
-RUN apt -y install g++-12 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
+# RUN apt -y install g++-12 && \
+#     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
 
 # 5.) Restore the ROS2 apt repos (optional)
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
@@ -91,7 +91,6 @@ RUN git clone https://github.com/ros/geometry2 && \
 
 # 5.3) Add tf support
 RUN apt -y install libangles-dev
-RUN g++ --version
 RUN git clone https://github.com/ros-o/geometry.git && \
     source geometry2/install/local_setup.bash && \
     cd geometry && \
