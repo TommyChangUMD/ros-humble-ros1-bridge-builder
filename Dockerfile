@@ -1,4 +1,7 @@
-FROM osrf/ros:humble-desktop
+FROM ros:humble-ros-base-jammy
+# For ARM64 CPU, use the following base image instead:
+#FROM arm64v8/ros:humble-ros-base-jammy
+
 #
 # How to build this docker image:
 #  docker build . -t ros-humble-ros1-bridge-builder
@@ -34,20 +37,27 @@ FROM osrf/ros:humble-desktop
 # Make sure we are using bash and catching errors
 SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-c"]
 
+###########################
 # 0.) Bring system up to the latest
+###########################
 RUN apt -y update
 RUN apt -y upgrade
 
-
+###########################
 # 1.) Temporarily remove ROS2 apt repository
+###########################
 RUN mv /etc/apt/sources.list.d/ros2-latest.list /root/
 RUN apt update
 
+###########################
 # 2.) comment out the catkin conflict
+###########################
 RUN sed  -i -e 's|^Conflicts: catkin|#Conflicts: catkin|' /var/lib/dpkg/status
 RUN apt install -f
 
+###########################
 # 3.) force install these packages
+###########################
 RUN apt download python3-catkin-pkg
 RUN apt download python3-rospkg
 RUN apt download python3-rosdistro
@@ -56,21 +66,23 @@ RUN dpkg --force-overwrite -i python3-rospkg*.deb
 RUN dpkg --force-overwrite -i python3-rosdistro*.deb
 RUN apt install -f
 
+###########################
 # 4.) Install ROS1 stuff
 # see https://packages.ubuntu.com/jammy/ros-core-dev
+###########################
 RUN apt -y install ros-core-dev
 
-#
-# 4.1) Install additional system packages
-# RUN apt -y install g++-12 && \
-#     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
-
+###########################
 # 5.) Restore the ROS2 apt repos (optional)
+###########################
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
 RUN apt -y update
 #RUN apt -y upgrade
 
+###########################
 # 5.1) Add additional ROS1 ros_tutorials messages and services
+###########################
+RUN apt -y install qtbase5-dev
 RUN git clone https://github.com/ros/ros_tutorials.git && \
     cd ros_tutorials && \
     git checkout noetic-devel && \
@@ -79,7 +91,9 @@ RUN git clone https://github.com/ros/ros_tutorials.git && \
     colcon test --event-handlers console_direct+ && \
     colcon test-result 
 
+###########################
 # 5.2) Add tf2 support
+###########################
 RUN apt -y install libactionlib-dev
 RUN git clone https://github.com/ros/geometry2 && \
     cd geometry2 && \
@@ -89,7 +103,9 @@ RUN git clone https://github.com/ros/geometry2 && \
     # colcon test --event-handlers console_direct+ && \
     # colcon test-result 
 
+###########################
 # 5.3) Add tf support
+###########################
 RUN apt -y install libangles-dev
 RUN git clone https://github.com/ros-o/geometry.git && \
     source geometry2/install/local_setup.bash && \
@@ -100,8 +116,10 @@ RUN git clone https://github.com/ros-o/geometry.git && \
     colcon test --event-handlers console_direct+ && \
     colcon test-result 
 
+###########################
 # 6.) Compile ros1_bridge
 # ref: https://github.com/ros2/ros1_bridge/issues/391
+###########################
 RUN source ros_tutorials/install/local_setup.bash && \
     source geometry2/install/local_setup.bash && \
     source geometry/install/local_setup.bash && \
@@ -120,10 +138,14 @@ RUN source ros_tutorials/install/local_setup.bash && \
     # colcon test --event-handlers console_direct+ && \
     # colcon test-result 
 
+###########################
 # 7.) Clean up
+###########################
 RUN apt -y clean all; apt -y update
 
+###########################
 # 8.) Pack all ROS1 dependent libraries
+###########################
 RUN ROS1_LIBS="libxmlrpcpp.so"; \
     ROS1_LIBS="$ROS1_LIBS librostime.so"; \
     ROS1_LIBS="$ROS1_LIBS libroscpp.so"; \
@@ -142,7 +164,9 @@ RUN ROS1_LIBS="libxmlrpcpp.so"; \
         cp $soFilePath ./; \
     done
 
+###########################
 # 9.) Spit out ros1_bridge tarball by default when no command is given
+###########################
 RUN tar czf /ros-humble-ros1-bridge.tgz \
     --exclude '*/build/*' --exclude '*/src/*' /ros-humble-ros1-bridge 
 ENTRYPOINT []
