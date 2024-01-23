@@ -77,4 +77,4 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
 - https://github.com/ros2/ros1_bridge
 - https://github.com/mjforan/ros-humble-ros1-bridge
 - https://github.com/ros2/ros1_bridge/issues/391
-- https://packages.ubuntu.com/jammy/ros-core-dev
+- https://packages.ubuntu.com/jammy/ros-robot-dev
