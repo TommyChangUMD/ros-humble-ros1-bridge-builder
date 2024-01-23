@@ -73,6 +73,39 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
 ```
 
 
+## Troubleshoot
+
+``` bash
+$ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i srv
+```
+```
+  - 'diagnostic_msgs/srv/AddDiagnostics' (ROS 2) <=> 'diagnostic_msgs/AddDiagnostics' (ROS 1)
+  - 'diagnostic_msgs/srv/SelfTest' (ROS 2) <=> 'diagnostic_msgs/SelfTest' (ROS 1)
+  - 'example_interfaces/srv/AddTwoInts' (ROS 2) <=> 'roscpp_tutorials/TwoInts' (ROS 1)
+  - 'example_interfaces/srv/AddTwoInts' (ROS 2) <=> 'rospy_tutorials/AddTwoInts' (ROS 1)
+  - 'nav_msgs/srv/GetMap' (ROS 2) <=> 'nav_msgs/GetMap' (ROS 1)
+  - 'nav_msgs/srv/GetPlan' (ROS 2) <=> 'nav_msgs/GetPlan' (ROS 1)
+  - 'nav_msgs/srv/LoadMap' (ROS 2) <=> 'nav_msgs/LoadMap' (ROS 1)
+  - 'nav_msgs/srv/SetMap' (ROS 2) <=> 'nav_msgs/SetMap' (ROS 1)
+  - 'sensor_msgs/srv/SetCameraInfo' (ROS 2) <=> 'sensor_msgs/SetCameraInfo' (ROS 1)
+  - 'std_srvs/srv/Empty' (ROS 2) <=> 'std_srvs/Empty' (ROS 1)
+  - 'std_srvs/srv/SetBool' (ROS 2) <=> 'std_srvs/SetBool' (ROS 1)
+  - 'std_srvs/srv/Trigger' (ROS 2) <=> 'std_srvs/Trigger' (ROS 1)
+  - 'tf2_msgs/srv/FrameGraph' (ROS 2) <=> 'tf2_msgs/FrameGraph' (ROS 1)
+```
+
+``` bash
+$ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i tf2
+```
+```
+  - 'tf2_msgs/msg/TF2Error' (ROS 2) <=> 'tf2_msgs/TF2Error' (ROS 1)
+  - 'tf2_msgs/msg/TFMessage' (ROS 2) <=> 'tf2_msgs/TFMessage' (ROS 1)
+  - 'tf2_msgs/msg/TFMessage' (ROS 2) <=> 'tf/tfMessage' (ROS 1)
+  - 'tf2_msgs/srv/FrameGraph' (ROS 2) <=> 'tf2_msgs/FrameGraph' (ROS 1)
+```
+
+
+
 ## References
 - https://github.com/ros2/ros1_bridge
 - https://github.com/mjforan/ros-humble-ros1-bridge
