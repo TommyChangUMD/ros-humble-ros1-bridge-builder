@@ -95,6 +95,7 @@ RUN git clone https://github.com/ros/ros_tutorials.git && \
 # 6.) Compile ros1_bridge
 # ref: https://github.com/ros2/ros1_bridge/issues/391
 ###########################
+RUN apt -y install ros-message-generation
 RUN source ros_tutorials/install/local_setup.bash && \
     source /opt/ros/humble/setup.bash  && \
     mkdir -p /ros-humble-ros1-bridge/src && \
