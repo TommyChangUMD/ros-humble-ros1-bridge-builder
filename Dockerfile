@@ -1,6 +1,5 @@
 FROM ros:humble-ros-base-jammy
-# For ARM64 CPU, use the following base image instead:
-#FROM arm64v8/ros:humble-ros-base-jammy
+# The above base image is multi-platfrom (works on ARM64 and AMD64)
 
 #
 # How to build this docker image:
@@ -68,20 +67,21 @@ RUN apt install -f
 
 ###########################
 # 4.) Install ROS1 stuff
-# see https://packages.ubuntu.com/jammy/ros-core-dev
+# see https://packages.ubuntu.com/jammy/ros-robot-dev
+# ros-robot-dev automatically includes tf tf2
 ###########################
-RUN apt -y install ros-core-dev
+RUN apt -y install ros-robot-dev
 
 ###########################
 # 5.) Restore the ROS2 apt repos (optional)
 ###########################
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
 RUN apt -y update
-#RUN apt -y upgrade
 
 ###########################
 # 5.1) Add additional ROS1 ros_tutorials messages and services
 ###########################
+RUN apt -y install ros-humble-example-interfaces
 RUN apt -y install qtbase5-dev
 RUN git clone https://github.com/ros/ros_tutorials.git && \
     cd ros_tutorials && \
@@ -92,37 +92,10 @@ RUN git clone https://github.com/ros/ros_tutorials.git && \
     colcon test-result 
 
 ###########################
-# 5.2) Add tf2 support
-###########################
-RUN apt -y install libactionlib-dev
-RUN git clone https://github.com/ros/geometry2 && \
-    cd geometry2 && \
-    git checkout noetic-devel && \
-    unset ROS_DISTRO && \
-    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
-    # colcon test --event-handlers console_direct+ && \
-    # colcon test-result 
-
-###########################
-# 5.3) Add tf support
-###########################
-RUN apt -y install libangles-dev
-RUN git clone https://github.com/ros-o/geometry.git && \
-    source geometry2/install/local_setup.bash && \
-    cd geometry && \
-    git checkout obese-devel && \
-    unset ROS_DISTRO && \
-    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
-    colcon test --event-handlers console_direct+ && \
-    colcon test-result 
-
-###########################
 # 6.) Compile ros1_bridge
 # ref: https://github.com/ros2/ros1_bridge/issues/391
 ###########################
 RUN source ros_tutorials/install/local_setup.bash && \
-    source geometry2/install/local_setup.bash && \
-    source geometry/install/local_setup.bash && \
     source /opt/ros/humble/setup.bash  && \
     mkdir -p /ros-humble-ros1-bridge/src && \
     cd /ros-humble-ros1-bridge/src && \
