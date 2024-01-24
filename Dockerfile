@@ -41,6 +41,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-c"]
 ###########################
 RUN apt -y update
 RUN apt -y upgrade
+RUN apt -y install ros-humble-desktop
 
 ###########################
 # 1.) Temporarily remove ROS2 apt repository
@@ -67,10 +68,10 @@ RUN apt install -f
 
 ###########################
 # 4.) Install ROS1 stuff
-# see https://packages.ubuntu.com/jammy/ros-robot-dev
-# ros-robot-dev automatically includes tf tf2
+# see https://packages.ubuntu.com/jammy/ros-desktop-dev
+# ros-desktop-dev automatically includes tf tf2
 ###########################
-RUN apt -y install ros-robot-dev
+RUN apt -y install ros-desktop-dev
 
 ###########################
 # 5.) Restore the ROS2 apt repos
@@ -82,15 +83,50 @@ RUN apt -y update
 # 5.1) Add additional ros_tutorials messages and services
 # eg., See AddTwoInts server and client tutorial
 ###########################
-RUN apt -y install ros-humble-example-interfaces
-RUN apt -y install qtbase5-dev
 RUN git clone https://github.com/ros/ros_tutorials.git && \
     cd ros_tutorials && \
     git checkout noetic-devel && \
     unset ROS_DISTRO && \
-    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
-    colcon test --event-handlers console_direct+ && \
-    colcon test-result 
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+# unit test (optional)
+# RUN cd ros_tutorials && unset ROS_DISTRO && \
+#     colcon test --event-handlers console_direct+ && \
+#     colcon test-result 
+
+###########################
+# 5.2 Add additional grid-map messages 
+###########################
+
+# naviation stuff (just need costmap_2d?)
+RUN apt -y install libsdl1.2-dev libsdl-image1.2-dev
+RUN git clone https://github.com/ros-planning/navigation.git  && \
+    cd navigation && \
+    git checkout noetic-devel && \
+    unset ROS_DISTRO && \
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release \
+      --packages-select map_server voxel_grid costmap_2d
+
+# filter stuff
+RUN git clone https://github.com/ros/filters.git   && \
+    cd filters && \
+    git checkout noetic-devel && \
+    unset ROS_DISTRO && \
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release 
+
+# fianlly grid-amp (only select a subset for now)
+RUN apt -y install ros-humble-grid-map 
+RUN apt -y install libpcl-ros-dev libcv-bridge-dev libmessage-filters-dev
+RUN source navigation/install/setup.bash && \
+    source filters/install/setup.bash && \
+    git clone https://github.com/ANYbotics/grid_map.git  && \
+    cd grid_map && \
+    git checkout 1.6.4 && \
+    unset ROS_DISTRO && \
+    grep -r c++11 | grep CMakeLists | cut -f 1 -d ':' | \
+      xargs sed -i -e 's|std=c++11|std=c++17|g' && \
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release \
+      --packages-select grid_map_msgs grid_map_core grid_map_octomap grid_map_sdf \
+      grid_map_costmap_2d grid_map_cv grid_map_ros grid_map_loader
 
 ###########################
 # 6.) Compile ros1_bridge
@@ -100,7 +136,8 @@ RUN git clone https://github.com/ros/ros_tutorials.git && \
 RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then \
     cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/; \
     fi
-RUN source ros_tutorials/install/local_setup.bash && \
+RUN source ros_tutorials/install/setup.bash && \
+    source grid_map/install/setup.bash && \
     source /opt/ros/humble/setup.bash  && \
     mkdir -p /ros-humble-ros1-bridge/src && \
     cd /ros-humble-ros1-bridge/src && \
@@ -113,8 +150,6 @@ RUN source ros_tutorials/install/local_setup.bash && \
     echo "Please wait...  running $MIN concurrent jobs to build ros1_bridge" && \
     time MAKEFLAGS="-j $MIN" colcon build --event-handlers console_direct+ \
       --cmake-args -DCMAKE_BUILD_TYPE=Release 
-    # colcon test --event-handlers console_direct+ && \
-    # colcon test-result 
 
 ###########################
 # 7.) Clean up
@@ -145,7 +180,8 @@ RUN ROS1_LIBS="libxmlrpcpp.so"; \
 ###########################
 # 9.) Spit out ros1_bridge tarball by default when no command is given
 ###########################
+RUN rm -f /ros-humble-ros1-bridge.tgz
 RUN tar czf /ros-humble-ros1-bridge.tgz \
     --exclude '*/build/*' --exclude '*/src/*' /ros-humble-ros1-bridge 
 ENTRYPOINT []
-CMD cat /ros-humble-ros1-bridge.tgz
+CMD cat /ros-humble-ros1-bridge.tgz; sync
