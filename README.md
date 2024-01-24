@@ -14,7 +14,7 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB 
 *Note: Since building the docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
 
 ## How to create ros-humble-ros1-bridge package:
-###  0.) Start from the latest ROS 2 Humble system, build a "ros-humble-ros1-bridge/" ROS2 package:
+###  0.) Start from the latest Ubuntu 22.04 ROS 2 Humble system, create the "ros-humble-ros1-bridge/" ROS2 package:
 
 ``` bash
     cd ~/
@@ -49,7 +49,7 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
   roscore
 ```
 
-###  3.) Now, from the ROS2 Humble system, start the ros1 bridge node.
+###  3.) Now, from the Ubuntu 22.04 ROS2 Humble system, start the ros1 bridge node.
 
 ``` bash
   source /opt/ros/humble/setup.bash
@@ -65,7 +65,7 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
   rosrun rospy_tutorials talker
 ```
 
-###  4.) Finally, from the ROS2 Humble system:
+###  4.) Finally, from the Ubuntu 22.04 ROS2 Humble system:
 
 ``` bash
   source /opt/ros/humble/setup.bash
