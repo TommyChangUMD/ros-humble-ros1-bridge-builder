@@ -6,29 +6,29 @@ FROM ros:humble-ros-base-jammy
 #  docker build . -t ros-humble-ros1-bridge-builder
 #
 # How to build ros-humble-ros1-bridge:
-#  # 0.) Start from the ROS 2 Humble system, build a "ros-humble-ros1-bridge/" ROS2 package:
+#  # 0.) From a Ubuntu 22.04 ROS 2 Humble system, create a "ros-humble-ros1-bridge/" ROS2 package:
 #  docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 #
-# How to use ros-humble-ros1-bridge:
+# How to use the ros-humble-ros1-bridge:
 #  # 1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
 #  rocker --x11 --user --home --privileged \
 #         --volume /dev/shm /dev/shm --network=host -- osrf/ros:noetic-desktop \
 #         'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
 #
-#  # 2.) Then, start "roscore" inside the ROS1 docker
+#  # 2.) Then, start "roscore" inside the ROS1 container:
 #  source /opt/ros/noetic/setup.bash
 #  roscore
 #
-#  # 3.) Now, from the ROS2 Humble system, start the ros1 bridge node.
+#  # 3.) Now, from the Ubuntu 22.04 ROS2 Humble system, start the ros1 bridge node:
 #  source /opt/ros/humble/setup.bash
 #  source ros-humble-ros1-bridge/install/local_setup.bash
 #  ros2 run ros1_bridge dynamic_bridge
 #
-#  # 3.) Back to the ROS1 Noetic docker container, run in another terminal tab:
+#  # 3.) Back to the ROS1 Noetic container, run in another terminal tab:
 #  source /opt/ros/noetic/setup.bash
 #  rosrun rospy_tutorials talker
 #
-#  # 4.) Finally, from the ROS2 Humble system:
+#  # 4.) Finally, from the Ubuntu 22.04 ROS2 Humble system:
 #  source /opt/ros/humble/setup.bash
 #  ros2 run demo_nodes_cpp listener
 #
@@ -73,13 +73,14 @@ RUN apt install -f
 RUN apt -y install ros-robot-dev
 
 ###########################
-# 5.) Restore the ROS2 apt repos (optional)
+# 5.) Restore the ROS2 apt repos
 ###########################
 RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
 RUN apt -y update
 
 ###########################
-# 5.1) Add additional ROS1 ros_tutorials messages and services
+# 5.1) Add additional ros_tutorials messages and services
+# eg., See AddTwoInts server and client tutorial
 ###########################
 RUN apt -y install ros-humble-example-interfaces
 RUN apt -y install qtbase5-dev
