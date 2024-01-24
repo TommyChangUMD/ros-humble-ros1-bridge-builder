@@ -100,7 +100,7 @@ RUN git clone https://github.com/ros/ros_tutorials.git && \
 RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then \
     cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/; \
     fi
-RUN source ros_tutorials/install/local_setup.bash && \
+RUN source ros_tutorials/install/setup.bash && \
     source /opt/ros/humble/setup.bash  && \
     mkdir -p /ros-humble-ros1-bridge/src && \
     cd /ros-humble-ros1-bridge/src && \
@@ -148,4 +148,4 @@ RUN ROS1_LIBS="libxmlrpcpp.so"; \
 RUN tar czf /ros-humble-ros1-bridge.tgz \
     --exclude '*/build/*' --exclude '*/src/*' /ros-humble-ros1-bridge 
 ENTRYPOINT []
-CMD cat /ros-humble-ros1-bridge.tgz
+CMD cat /ros-humble-ros1-bridge.tgz; sync
