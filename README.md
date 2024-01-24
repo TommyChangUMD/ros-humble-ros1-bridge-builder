@@ -8,21 +8,32 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB 
 ``` bash
   git clone https://github.com/TommyChangUMD/ros-humble-ros1-bridge-builder.git
   cd ros-humble-ros1-bridge-builder
+
+  # By default, ros-tutorals support will be built: (bridging the ros-humble-example-interfaces package)
   docker build . -t ros-humble-ros1-bridge-builder
+
+  # If you don't want to build ros-tutorals support:
+  docker build . --build-arg ADD_ros_tutorials=0 -t ros-humble-ros1-bridge-builder
+  
+  # If you want to build grid-map support:  (bridging the ros-humble-grid-map package)
+  docker build . --build-arg ADD_grid_map=1 -t ros-humble-ros1-bridge-builder
 ```
 
 *Note: Since building the docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
 
 ## How to create ros-humble-ros1-bridge package:
-###  0.) Start from the latest Ubuntu 22.04 ROS 2 Humble system, create the "ros-humble-ros1-bridge/" ROS2 package:
+###  0.) Start from the latest Ubuntu 22.04 ROS 2 Humble Desktop system, create the "ros-humble-ros1-bridge/" ROS2 package:
 
 ``` bash
     cd ~/
     apt update; apt upgrade
+    apt -y install ros-humble-desktop
     docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 ```
 
-We don't need the builder image anymore, to delete it, do:
+Note1, it's important that you have `ros-humble-desktop` installed on your Humble system because we want to **match the builder image as closely as possible**.
+
+Note2: We don't need the builder image anymore, to delete it, do:
 
 ``` bash
     docker rmi ros-humble-ros1-bridge-builder
@@ -75,33 +86,39 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
 
 ## Troubleshoot
 
-``` bash
-$ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i srv
-```
-```
-  - 'diagnostic_msgs/srv/AddDiagnostics' (ROS 2) <=> 'diagnostic_msgs/AddDiagnostics' (ROS 1)
-  - 'diagnostic_msgs/srv/SelfTest' (ROS 2) <=> 'diagnostic_msgs/SelfTest' (ROS 1)
-  - 'example_interfaces/srv/AddTwoInts' (ROS 2) <=> 'roscpp_tutorials/TwoInts' (ROS 1)
-  - 'example_interfaces/srv/AddTwoInts' (ROS 2) <=> 'rospy_tutorials/AddTwoInts' (ROS 1)
-  - 'nav_msgs/srv/GetMap' (ROS 2) <=> 'nav_msgs/GetMap' (ROS 1)
-  - 'nav_msgs/srv/GetPlan' (ROS 2) <=> 'nav_msgs/GetPlan' (ROS 1)
-  - 'nav_msgs/srv/LoadMap' (ROS 2) <=> 'nav_msgs/LoadMap' (ROS 1)
-  - 'nav_msgs/srv/SetMap' (ROS 2) <=> 'nav_msgs/SetMap' (ROS 1)
-  - 'sensor_msgs/srv/SetCameraInfo' (ROS 2) <=> 'sensor_msgs/SetCameraInfo' (ROS 1)
-  - 'std_srvs/srv/Empty' (ROS 2) <=> 'std_srvs/Empty' (ROS 1)
-  - 'std_srvs/srv/SetBool' (ROS 2) <=> 'std_srvs/SetBool' (ROS 1)
-  - 'std_srvs/srv/Trigger' (ROS 2) <=> 'std_srvs/Trigger' (ROS 1)
-  - 'tf2_msgs/srv/FrameGraph' (ROS 2) <=> 'tf2_msgs/FrameGraph' (ROS 1)
-```
-
+### Check tf2 message / service
 ``` bash
 $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i tf2
-```
-```
   - 'tf2_msgs/msg/TF2Error' (ROS 2) <=> 'tf2_msgs/TF2Error' (ROS 1)
   - 'tf2_msgs/msg/TFMessage' (ROS 2) <=> 'tf2_msgs/TFMessage' (ROS 1)
   - 'tf2_msgs/msg/TFMessage' (ROS 2) <=> 'tf/tfMessage' (ROS 1)
   - 'tf2_msgs/srv/FrameGraph' (ROS 2) <=> 'tf2_msgs/FrameGraph' (ROS 1)
+```
+
+### Check AddTwoInts message / service
+By default, `--build-arg ADD_ros_tutorials=1` is implicitly added to the `docker build ...` command.
+
+Note: In addition, the ROS2 Humble system must have the `ros-humble-example-interfaces` package installed.
+``` bash
+$ sudo apt -y install ros-humble-example-interfaces
+$ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i addtwoints
+  - 'example_interfaces/srv/AddTwoInts' (ROS 2) <=> 'roscpp_tutorials/TwoInts' (ROS 1)
+  - 'example_interfaces/srv/AddTwoInts' (ROS 2) <=> 'rospy_tutorials/AddTwoInts' (ROS 1)
+```
+
+### Check grid-map message / service
+Must have `--build-arg ADD_grid_map=1` added to the `docker build ...` command.
+
+Note: In addition, the ROS2 Humble system must have the `ros-humble-grid-map` package installed.
+``` bash
+$ sudo apt -y install ros-humble-grid-map
+$ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i grid_map
+  - 'grid_map_msgs/msg/GridMap' (ROS 2) <=> 'grid_map_msgs/GridMap' (ROS 1)
+  - 'grid_map_msgs/msg/GridMapInfo' (ROS 2) <=> 'grid_map_msgs/GridMapInfo' (ROS 1)
+  - 'grid_map_msgs/srv/GetGridMap' (ROS 2) <=> 'grid_map_msgs/GetGridMap' (ROS 1)
+  - 'grid_map_msgs/srv/GetGridMapInfo' (ROS 2) <=> 'grid_map_msgs/GetGridMapInfo' (ROS 1)
+  - 'grid_map_msgs/srv/ProcessFile' (ROS 2) <=> 'grid_map_msgs/ProcessFile' (ROS 1)
+  - 'grid_map_msgs/srv/SetGridMap' (ROS 2) <=> 'grid_map_msgs/SetGridMap' (ROS 1)
 ```
 
 
