@@ -31,7 +31,9 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB 
     docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 ```
 
-Note1, it's important that you have `ros-humble-desktop` installed on your Humble system because we want to **match the builder image as closely as possible**.
+Note1, it's important that you have `ros-humble-desktop` installed on your ROS2 Humble system because we want to **match the builder image as closely as possible**.
+
+Note1: There is no compilation at this point, the `docker run` command simply spits out a pre-compiled tarball.  The assumption is that this tarball contains configurations and libraries matching your ROS2 Humble system very closely, although not identical.
 
 Note2: We don't need the builder image anymore, to delete it, do:
 
@@ -127,4 +129,4 @@ $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i grid_map
 - https://github.com/ros2/ros1_bridge
 - https://github.com/mjforan/ros-humble-ros1-bridge
 - https://github.com/ros2/ros1_bridge/issues/391
-- https://packages.ubuntu.com/jammy/ros-robot-dev
+- https://packages.ubuntu.com/jammy/ros-desktop-dev
