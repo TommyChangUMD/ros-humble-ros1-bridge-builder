@@ -159,7 +159,6 @@ RUN if [[ "$ADD_grid_map" = "1" ]]; then                                        
 
 ###########################
 # 7.) Compile ros1_bridge
-# ref: https://github.com/ros2/ros1_bridge/issues/391
 ###########################
 RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                                           \
        source ros_tutorials/install/setup.bash; fi &&                                   \
@@ -168,9 +167,9 @@ RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                                   
      source /opt/ros/humble/setup.bash  &&                                              \
      mkdir -p /ros-humble-ros1-bridge/src &&                                            \
      cd /ros-humble-ros1-bridge/src &&                                                  \
-     git clone https://github.com/ros2/ros1_bridge &&                                   \
+     git clone https://github.com/smith-doug/ros1_bridge.git &&                         \
      cd ros1_bridge/ &&                                                                 \
-     git checkout b9f1739 &&                                                            \
+     git checkout action_bridge_humble &&                                               \
      cd ../.. &&                                                                        \
      MEMG=$(printf "%.0f" $(free -g | awk '/^Mem:/{print $2}'));                        \
      NPROC=$(nproc);  MIN=$((MEMG<NPROC ? MEMG : NPROC));                               \
@@ -203,6 +202,7 @@ RUN ROS1_LIBS="libxmlrpcpp.so";                                                 
      ROS1_LIBS="$ROS1_LIBS libb64.so";                                                  \
      ROS1_LIBS="$ROS1_LIBS libaprutil-1.so";                                            \
      ROS1_LIBS="$ROS1_LIBS libapr-1.so";                                                \
+     ROS1_LIBS="libactionlib.so.1d";                                                    \
      cd /ros-humble-ros1-bridge/install/ros1_bridge/lib;                                \
      for soFile in $ROS1_LIBS; do                                                       \
          soFilePath=$(ldd libros1_bridge.so | grep $soFile | awk '{print $3;}');        \

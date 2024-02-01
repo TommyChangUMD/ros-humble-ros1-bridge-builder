@@ -127,6 +127,6 @@ $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i grid_map
 
 ## References
 - https://github.com/ros2/ros1_bridge
+- https://github.com/smith-doug/ros1_bridge/tree/action_bridge_humble
 - https://github.com/mjforan/ros-humble-ros1-bridge
-- https://github.com/ros2/ros1_bridge/issues/391
 - https://packages.ubuntu.com/jammy/ros-desktop-dev
