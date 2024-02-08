@@ -202,7 +202,7 @@ RUN ROS1_LIBS="libxmlrpcpp.so";                                                 
      ROS1_LIBS="$ROS1_LIBS libb64.so";                                                  \
      ROS1_LIBS="$ROS1_LIBS libaprutil-1.so";                                            \
      ROS1_LIBS="$ROS1_LIBS libapr-1.so";                                                \
-     ROS1_LIBS="libactionlib.so.1d";                                                    \
+     ROS1_LIBS="$ROS1_LIBS libactionlib.so.1d";                                         \
      cd /ros-humble-ros1-bridge/install/ros1_bridge/lib;                                \
      for soFile in $ROS1_LIBS; do                                                       \
          soFilePath=$(ldd libros1_bridge.so | grep $soFile | awk '{print $3;}');        \
