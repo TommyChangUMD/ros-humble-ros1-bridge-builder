@@ -20,6 +20,7 @@ Alternative builds:
   
   # **[OPTIONAL]** If you want to build grid-map support:  (bridging the ros-humble-grid-map package)
   docker build . --build-arg ADD_grid_map=1 -t ros-humble-ros1-bridge-builder
+  sudo apt -y install ros-humble-grid-map
 ```
 
 *Note: Since building the docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
