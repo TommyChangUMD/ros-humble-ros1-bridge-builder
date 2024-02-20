@@ -13,6 +13,8 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB 
   docker build . -t ros-humble-ros1-bridge-builder
 ```
 
+*Note: Since building the docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
+
 Alternative builds:
 ```
   # **[OPTIONAL]** If you don't want to build ros-tutorals support:
@@ -21,8 +23,7 @@ Alternative builds:
   # **[OPTIONAL]** If you want to build grid-map support:  (bridging the ros-humble-grid-map package)
   docker build . --build-arg ADD_grid_map=1 -t ros-humble-ros1-bridge-builder
 ```
-
-*Note: Since building the docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
+*Note: Don't forget to install the necessary `ros-humble-grid-map` packages on your ROS2 Humble if you choose to build the bridge with the `grid-map` support added.
 
 ## How to create ros-humble-ros1-bridge package:
 ###  0.) Start from the latest Ubuntu 22.04 ROS 2 Humble Desktop system, create the "ros-humble-ros1-bridge/" ROS2 package:
