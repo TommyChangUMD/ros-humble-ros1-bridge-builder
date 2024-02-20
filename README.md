@@ -11,7 +11,10 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU and 24GB 
 
   # By default, ros-tutorals support will be built: (bridging the ros-humble-example-interfaces package)
   docker build . -t ros-humble-ros1-bridge-builder
+```
 
+Alternative builds:
+```
   # **[OPTIONAL]** If you don't want to build ros-tutorals support:
   docker build . --build-arg ADD_ros_tutorials=0 -t ros-humble-ros1-bridge-builder
   
