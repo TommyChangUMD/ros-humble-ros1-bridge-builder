@@ -35,7 +35,12 @@ Alternative builds:
     docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 ```
 
-Note1, it's important that you have `ros-humble-desktop` installed on your ROS2 Humble system because we want to **match the builder image as closely as possible**.
+Note1, it's **important** that you have **`ros-humble-desktop`** installed on your ROS2 Humble system because we want to **match it with the builder image as closely as possible**.  So, if you haven't done so already, do:
+``` bash
+    apt -y install ros-humble-desktop
+```
+Otherwise you may get an error about missing `ibexample_interfaces__rosidl_typesupport_cpp.so`.  See issue https://github.com/TommyChangUMD/ros-humble-ros1-bridge-builder/issues/10
+
 
 Note1: There is no compilation at this point, the `docker run` command simply spits out a pre-compiled tarball.  The assumption is that this tarball contains configurations and libraries matching your ROS2 Humble system very closely, although not identical.
 
