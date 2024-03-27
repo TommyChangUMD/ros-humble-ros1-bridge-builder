@@ -87,8 +87,8 @@ RUN apt-get install -f
 RUN apt-get -y install ros-desktop-dev
 
 # fix ARM64 pkgconfig path issue -- Fix provided by ambrosekwok 
-RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then                    \
-    cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/;    \
+RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then                     \
+      cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/;   \
     fi
 
 ###########################
@@ -101,81 +101,92 @@ RUN apt-get -y update
 # 6.1) Add additional ros_tutorials messages and services
 # eg., See AddTwoInts server and client tutorial
 ###########################
-RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                   \
-     apt-get -y install ros-humble-example-interfaces &&        \
-     git clone https://github.com/ros/ros_tutorials.git &&      \
-     cd ros_tutorials &&                                        \
-     git checkout noetic-devel &&                               \
-     unset ROS_DISTRO &&                                        \
-     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release; \
-     fi
+RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                           \
+      git clone https://github.com/ros/ros_tutorials.git &&             \
+      cd ros_tutorials &&                                               \
+      git checkout noetic-devel &&                                      \
+      unset ROS_DISTRO &&                                               \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
+    fi
 
 # unit test (optional)
 RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then           \
-     cd ros_tutorials && unset ROS_DISTRO &&            \
-     colcon test --event-handlers console_direct+ &&    \
-     colcon test-result;                                \
-     fi
+      cd ros_tutorials && unset ROS_DISTRO &&           \
+      colcon test --event-handlers console_direct+ &&   \
+      colcon test-result;                               \
+    fi
 
 ###########################
 # 6.2 Add additional grid-map messages 
 ###########################
 # navigation stuff (just need costmap_2d?)
 RUN if [[ "$ADD_grid_map" = "1" ]]; then                                \
-     apt-get -y install libsdl1.2-dev libsdl-image1.2-dev &&            \
-     git clone https://github.com/ros-planning/navigation.git  &&       \
-     cd navigation &&                                                   \
-     git checkout noetic-devel &&                                       \
-     unset ROS_DISTRO &&                                                \
-     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release          \
-       --packages-select map_server voxel_grid costmap_2d;              \
-     fi
+      apt-get -y install libsdl1.2-dev libsdl-image1.2-dev &&           \
+      git clone https://github.com/ros-planning/navigation.git  &&      \
+      cd navigation &&                                                  \
+      git checkout noetic-devel &&                                      \
+      unset ROS_DISTRO &&                                               \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release         \
+        --packages-select map_server voxel_grid costmap_2d;             \
+    fi
 
 # filter stuff
-RUN if [[ "$ADD_grid_map" = "1" ]]; then                        \
-     git clone https://github.com/ros/filters.git   &&          \
-     cd filters &&                                              \
-     git checkout noetic-devel &&                               \
-     unset ROS_DISTRO &&                                        \
-     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release; \
-     fi
+RUN if [[ "$ADD_grid_map" = "1" ]]; then                                \
+      git clone https://github.com/ros/filters.git   &&                 \
+      cd filters &&                                                     \
+      git checkout noetic-devel &&                                      \
+      unset ROS_DISTRO &&                                               \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
+    fi
 
 # finally grid-amp (only select a subset for now)
 RUN if [[ "$ADD_grid_map" = "1" ]]; then                                                \
-     apt-get -y install ros-humble-grid-map &&                                          \
-     apt-get -y install libpcl-ros-dev libcv-bridge-dev &&                              \
-     source navigation/install/setup.bash &&                                            \
-     source filters/install/setup.bash &&                                               \
-     git clone https://github.com/ANYbotics/grid_map.git  &&                            \
-     cd grid_map &&                                                                     \
-     git checkout 1.6.4 &&                                                              \
-     unset ROS_DISTRO &&                                                                \
-     grep -r c++11 | grep CMakeLists | cut -f 1 -d ':' |                                \
-       xargs sed -i -e 's|std=c++11|std=c++17|g' &&                                     \
-     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release                          \
-       --packages-select grid_map_msgs grid_map_core grid_map_octomap grid_map_sdf      \
-       grid_map_costmap_2d grid_map_cv grid_map_ros grid_map_loader;                    \
-     fi
+      apt-get -y install libpcl-ros-dev libcv-bridge-dev &&                             \
+      source navigation/install/setup.bash &&                                           \
+      source filters/install/setup.bash &&                                              \
+      git clone https://github.com/ANYbotics/grid_map.git  &&                           \
+      cd grid_map &&                                                                    \
+      git checkout 1.6.4 &&                                                             \
+      unset ROS_DISTRO &&                                                               \
+      grep -r c++11 | grep CMakeLists | cut -f 1 -d ':' |                               \
+        xargs sed -i -e 's|std=c++11|std=c++17|g' &&                                    \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release                         \
+        --packages-select grid_map_msgs grid_map_core grid_map_octomap grid_map_sdf     \
+        grid_map_costmap_2d grid_map_cv grid_map_ros grid_map_loader;                   \
+    fi
 
 ###########################
 # 7.) Compile ros1_bridge
 ###########################
-RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                                           \
-       source ros_tutorials/install/setup.bash; fi &&                                   \
-     if [[ "$ADD_grid_map" = "1" ]]; then                                               \
-       source grid_map/install/setup.bash; fi &&                                        \
-     source /opt/ros/humble/setup.bash  &&                                              \
-     mkdir -p /ros-humble-ros1-bridge/src &&                                            \
-     cd /ros-humble-ros1-bridge/src &&                                                  \
-     git clone https://github.com/smith-doug/ros1_bridge.git &&                         \
-     cd ros1_bridge/ &&                                                                 \
-     git checkout action_bridge_humble &&                                               \
-     cd ../.. &&                                                                        \
-     MEMG=$(printf "%.0f" $(free -g | awk '/^Mem:/{print $2}'));                        \
-     NPROC=$(nproc);  MIN=$((MEMG<NPROC ? MEMG : NPROC));                               \
-     echo "Please wait...  running $MIN concurrent jobs to build ros1_bridge" &&        \
-     time MAKEFLAGS="-j $MIN" colcon build --event-handlers console_direct+             \
-       --cmake-args -DCMAKE_BUILD_TYPE=Release 
+RUN                                                                             \
+    # Apply ROS2 underlay                                                       \
+    source /opt/ros/humble/setup.bash  &&                                       \
+    # Apply custom messages or services                                         \
+    if [[ "$ADD_ros_tutorials" = "1" ]]; then                                   \
+      # Apply ROS1 package overlay                                              \
+      source ros_tutorials/install/setup.bash;                                  \
+      # Apply ROS2 package overlay                                              \
+      apt-get -y install ros-humble-example-interfaces;                         \
+      source /opt/ros/humble/setup.bash;                                        \
+    fi &&                                                                       \
+    if [[ "$ADD_grid_map" = "1" ]]; then                                        \
+      # Apply ROS1 package overlay                                              \
+      source grid_map/install/setup.bash;                                       \
+      # Apply ROS2 package overlay                                              \
+      apt-get -y install ros-humble-grid-map;                                   \
+      source /opt/ros/humble/setup.bash;                                        \
+    fi &&                                                                       \
+    mkdir -p /ros-humble-ros1-bridge/src &&                                     \
+    cd /ros-humble-ros1-bridge/src &&                                           \
+    git clone https://github.com/smith-doug/ros1_bridge.git &&                  \
+    cd ros1_bridge/ &&                                                          \
+    git checkout action_bridge_humble &&                                        \
+    cd ../.. &&                                                                 \
+    MEMG=$(printf "%.0f" $(free -g | awk '/^Mem:/{print $2}'));                 \
+    NPROC=$(nproc);  MIN=$((MEMG<NPROC ? MEMG : NPROC));                        \
+    echo "Please wait...  running $MIN concurrent jobs to build ros1_bridge" && \
+    time MAKEFLAGS="-j $MIN" colcon build --event-handlers console_direct+      \
+      --cmake-args -DCMAKE_BUILD_TYPE=Release 
 
 ###########################
 # 8.) Clean up
@@ -187,26 +198,26 @@ RUN apt-get -y clean all; apt-get -y update
 ###########################
 # fix ARM64 pkgconfig path issue -- Fix provided by ambrosekwok 
 RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then                    \
-    cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/;    \
+      cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/;  \
     fi
 
-RUN ROS1_LIBS="libxmlrpcpp.so";                                                         \
-     ROS1_LIBS="$ROS1_LIBS librostime.so";                                              \
-     ROS1_LIBS="$ROS1_LIBS libroscpp.so";                                               \
-     ROS1_LIBS="$ROS1_LIBS libroscpp_serialization.so";                                 \
-     ROS1_LIBS="$ROS1_LIBS librosconsole.so";                                           \
-     ROS1_LIBS="$ROS1_LIBS librosconsole_log4cxx.so";                                   \
-     ROS1_LIBS="$ROS1_LIBS librosconsole_backend_interface.so";                         \
-     ROS1_LIBS="$ROS1_LIBS liblog4cxx.so";                                              \
-     ROS1_LIBS="$ROS1_LIBS libcpp_common.so";                                           \
-     ROS1_LIBS="$ROS1_LIBS libb64.so";                                                  \
-     ROS1_LIBS="$ROS1_LIBS libaprutil-1.so";                                            \
-     ROS1_LIBS="$ROS1_LIBS libapr-1.so";                                                \
-     ROS1_LIBS="$ROS1_LIBS libactionlib.so.1d";                                         \
-     cd /ros-humble-ros1-bridge/install/ros1_bridge/lib;                                \
-     for soFile in $ROS1_LIBS; do                                                       \
-         soFilePath=$(ldd libros1_bridge.so | grep $soFile | awk '{print $3;}');        \
-         cp $soFilePath ./;                                                             \
+RUN ROS1_LIBS="libxmlrpcpp.so";                                                 \
+     ROS1_LIBS="$ROS1_LIBS librostime.so";                                      \
+     ROS1_LIBS="$ROS1_LIBS libroscpp.so";                                       \
+     ROS1_LIBS="$ROS1_LIBS libroscpp_serialization.so";                         \
+     ROS1_LIBS="$ROS1_LIBS librosconsole.so";                                   \
+     ROS1_LIBS="$ROS1_LIBS librosconsole_log4cxx.so";                           \
+     ROS1_LIBS="$ROS1_LIBS librosconsole_backend_interface.so";                 \
+     ROS1_LIBS="$ROS1_LIBS liblog4cxx.so";                                      \
+     ROS1_LIBS="$ROS1_LIBS libcpp_common.so";                                   \
+     ROS1_LIBS="$ROS1_LIBS libb64.so";                                          \
+     ROS1_LIBS="$ROS1_LIBS libaprutil-1.so";                                    \
+     ROS1_LIBS="$ROS1_LIBS libapr-1.so";                                        \
+     ROS1_LIBS="$ROS1_LIBS libactionlib.so.1d";                                 \
+     cd /ros-humble-ros1-bridge/install/ros1_bridge/lib;                        \
+     for soFile in $ROS1_LIBS; do                                               \
+       soFilePath=$(ldd libros1_bridge.so | grep $soFile | awk '{print $3;}');  \
+       cp $soFilePath ./;                                                       \
      done
 
 ###########################
