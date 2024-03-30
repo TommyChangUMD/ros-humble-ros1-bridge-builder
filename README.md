@@ -22,8 +22,12 @@ Alternative builds:
   
   # **[OPTIONAL]** If you want to build grid-map support:  (bridging the ros-humble-grid-map package)
   docker build . --build-arg ADD_grid_map=1 -t ros-humble-ros1-bridge-builder
+
+  # **[OPTIONAL]** If you want to build an example custom message:
+  docker build . --build-arg ADD_custom_msgs=1 -t ros-humble-ros1-bridge-builder
 ```
-*Note: Don't forget to install the necessary `ros-humble-grid-map` packages on your ROS2 Humble if you choose to build the bridge with the `grid-map` support added.
+- Note: Don't forget to install the necessary `ros-humble-grid-map` packages on your ROS2 Humble if you choose to build the bridge with the `grid-map` support added.
+- Note2: For the custom message example, there is no pre-build package for ROS2 Humble so you will need to compile it from the source.  See "Check example custom message" in the Troubleshoot section.
 
 ## How to create ros-humble-ros1-bridge package:
 ###  0.) Start from the latest Ubuntu 22.04 ROS 2 Humble Desktop system, create the "ros-humble-ros1-bridge/" ROS2 package:
@@ -94,6 +98,14 @@ Note: It's important to share the host's network and the `/dev/shm/` directory w
   ros2 run demo_nodes_cpp listener
 ```
 
+## How to add custom message from ROS1 and ROS2 source code
+See an step 6.3 and 7 in the Dockerfile for an example.
+
+- Note1: Make sure the package name ends with "_msgs".
+- Note2: Use the same package name for both ROS1 and ROS2.
+   
+See https://github.com/ros2/ros1_bridge/blob/master/doc/index.rst
+
 
 ## Troubleshoot
 
@@ -132,6 +144,19 @@ $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i grid_map
   - 'grid_map_msgs/srv/SetGridMap' (ROS 2) <=> 'grid_map_msgs/SetGridMap' (ROS 1)
 ```
 
+### Check example custom message
+Must have `--build-arg ADD_custom_msgs=1` added to the `docker build ...` command.
+``` bash
+$ git clone https://github.com/TommyChangUMD/custom_msgs.git 
+$ cd custom_msgs/custom_msgs_ros2 
+$ source /opt/ros/humble/setup.bash
+$ colcon build 
+$ source custom_msgs/custom_msgs_ros2/install/setup.bash
+$ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i PseudoGridMap
+  - 'custom_msgs/msg/PseudoGridMap' (ROS 2) <=> 'custom_msgs/PseudoGridMap' (ROS 1)
+```
+
+
 #### Error: gibgrid_map_msgs__rosidl_typesupport_cpp.so: cannot open shared object file: No such file or directory
 ``` bash
 $ sudo apt -y install ros-humble-grid-map
@@ -139,6 +164,7 @@ $ sudo apt -y install ros-humble-grid-map
 
 ## References
 - https://github.com/ros2/ros1_bridge
+- https://github.com/ros2/ros1_bridge/blob/master/doc/index.rst
 - https://github.com/smith-doug/ros1_bridge/tree/action_bridge_humble
 - https://github.com/mjforan/ros-humble-ros1-bridge
 - https://packages.ubuntu.com/jammy/ros-desktop-dev

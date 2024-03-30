@@ -45,9 +45,12 @@ SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-c"]
 ARG ADD_ros_tutorials=1
 # for ros-humble-grid-map:
 ARG ADD_grid_map=0
+# for a custom message example
+ARG ADD_custom_msgs=0
 # sanity check:
 RUN echo "ADD_grid_map      = '$ADD_grid_map'"
 RUN echo "ADD_ros_tutorials = '$ADD_ros_tutorials'"
+RUN echo "ADD_custom_msgs   = '$ADD_custom_msgs'"
 
 ###########################
 # 1.) Bring system up to the latest ROS desktop configuration
@@ -155,13 +158,37 @@ RUN if [[ "$ADD_grid_map" = "1" ]]; then                                        
         grid_map_costmap_2d grid_map_cv grid_map_ros grid_map_loader;                   \
     fi
 
+
+######################################
+# 6.3) Compile custom message (by Codaero)
+#   Note1: Make sure the package name ends with "_msgs".
+#   Note2: Use the same package name for both ROS1 and ROS2.
+#   See https://github.com/ros2/ros1_bridge/blob/master/doc/index.rst
+######################################
+RUN if [[ "$ADD_custom_msgs" = "1" ]]; then                             \
+      git clone https://github.com/TommyChangUMD/custom_msgs.git;       \
+      # Compile ROS1:                                                   \
+      cd /custom_msgs/custom_msgs_ros1;                                 \
+      unset ROS_DISTRO;                                                 \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
+      # Compile ROS2:                                                   \
+      cd /custom_msgs/custom_msgs_ros2;                                 \
+      source /opt/ros/humble/setup.bash;                                \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
+    fi
+
 ###########################
 # 7.) Compile ros1_bridge
 ###########################
 RUN                                                                             \
+    #-------------------------------------                                      \
     # Apply ROS2 underlay                                                       \
+    #-------------------------------------                                      \
     source /opt/ros/humble/setup.bash  &&                                       \
+    #                                                                           \
+    #-------------------------------------                                      \
     # Apply custom messages or services                                         \
+    #-------------------------------------                                      \
     if [[ "$ADD_ros_tutorials" = "1" ]]; then                                   \
       # Apply ROS1 package overlay                                              \
       source ros_tutorials/install/setup.bash;                                  \
@@ -169,6 +196,7 @@ RUN                                                                             
       apt-get -y install ros-humble-example-interfaces;                         \
       source /opt/ros/humble/setup.bash;                                        \
     fi &&                                                                       \
+    #                                                                           \
     if [[ "$ADD_grid_map" = "1" ]]; then                                        \
       # Apply ROS1 package overlay                                              \
       source grid_map/install/setup.bash;                                       \
@@ -176,6 +204,17 @@ RUN                                                                             
       apt-get -y install ros-humble-grid-map;                                   \
       source /opt/ros/humble/setup.bash;                                        \
     fi &&                                                                       \
+    #                                                                           \
+    if [[ "$ADD_custom_msgs" = "1" ]]; then                                     \
+      # Apply ROS1 package overlay                                              \
+      source /custom_msgs/custom_msgs_ros1/install/setup.bash;                  \
+      # Apply ROS2 package overlay                                              \
+      source /custom_msgs/custom_msgs_ros2/install/setup.bash;                  \
+    fi &&                                                                       \
+    #                                                                           \
+    #-------------------------------------                                      \
+    # Build the Bridge                                                          \
+    #-------------------------------------                                      \
     mkdir -p /ros-humble-ros1-bridge/src &&                                     \
     cd /ros-humble-ros1-bridge/src &&                                           \
     git clone https://github.com/smith-doug/ros1_bridge.git &&                  \
