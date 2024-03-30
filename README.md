@@ -147,11 +147,15 @@ $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i grid_map
 ### Check example custom message
 Must have `--build-arg ADD_custom_msgs=1` added to the `docker build ...` command.
 ``` bash
+# First, install the ROS2 pacakge from the source
 $ git clone https://github.com/TommyChangUMD/custom_msgs.git 
 $ cd custom_msgs/custom_msgs_ros2 
 $ source /opt/ros/humble/setup.bash
 $ colcon build 
 $ source custom_msgs/custom_msgs_ros2/install/setup.bash
+
+# Now, run the bridge
+$ source ~/ros-humble-ros1-bridge/install/local_setup.bash
 $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i PseudoGridMap
   - 'custom_msgs/msg/PseudoGridMap' (ROS 2) <=> 'custom_msgs/PseudoGridMap' (ROS 1)
 ```
