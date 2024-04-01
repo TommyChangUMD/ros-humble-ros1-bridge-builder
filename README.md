@@ -145,6 +145,8 @@ $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i grid_map
 ```
 
 ### Check example custom message
+Thanks to [Codaero](https://github.com/Codaero) for the custom message source code.
+
 Must have `--build-arg ADD_custom_msgs=1` added to the `docker build ...` command.
 ``` bash
 # First, install the ROS2 pacakge from the source
@@ -159,7 +161,6 @@ $ source ~/ros-humble-ros1-bridge/install/local_setup.bash
 $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i PseudoGridMap
   - 'custom_msgs/msg/PseudoGridMap' (ROS 2) <=> 'custom_msgs/PseudoGridMap' (ROS 1)
 ```
-
 
 #### Error: gibgrid_map_msgs__rosidl_typesupport_cpp.so: cannot open shared object file: No such file or directory
 ``` bash
