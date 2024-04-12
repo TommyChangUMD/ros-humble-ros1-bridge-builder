@@ -58,7 +58,7 @@ Note2: We don't need the builder image anymore, to delete it, do:
 ###  1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
 
 ``` bash
-  rocker --x11 --user --home --privileged \
+  rocker --x11 --user --privileged \
          --volume /dev/shm /dev/shm --network=host -- osrf/ros:noetic-desktop \
          'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
 ```
@@ -66,7 +66,8 @@ You may need to install rocker first:
 ``` bash
   sudo apt install python3-rocker
 ```
-Note: It's important to share the host's network and the `/dev/shm/` directory with the container.
+Note1: It's important to share the host's network and the `/dev/shm/` directory with the container.
+Note2: You can add the `--home` rocker option if you want your home directory to be shared with the docker container.  Be careful though, as the host's `~/.bashrc` will be executed by the container.
 
 ###  2.) Then, start "roscore" inside the ROS1 Noetic docker container
 

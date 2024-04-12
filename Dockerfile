@@ -11,7 +11,7 @@ FROM ros:humble-ros-base-jammy
 #
 # How to use the ros-humble-ros1-bridge:
 #  # 1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
-#  rocker --x11 --user --home --privileged \
+#  rocker --x11 --user --privileged \
 #         --volume /dev/shm /dev/shm --network=host -- osrf/ros:noetic-desktop \
 #         'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
 #
