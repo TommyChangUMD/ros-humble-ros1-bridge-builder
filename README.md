@@ -155,7 +155,7 @@ $ git clone https://github.com/TommyChangUMD/custom_msgs.git
 $ cd custom_msgs/custom_msgs_ros2 
 $ source /opt/ros/humble/setup.bash
 $ colcon build 
-$ source custom_msgs/custom_msgs_ros2/install/setup.bash
+$ source install/setup.bash
 
 # Now, run the bridge
 $ source ~/ros-humble-ros1-bridge/install/local_setup.bash
