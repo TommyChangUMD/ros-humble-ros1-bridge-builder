@@ -67,7 +67,7 @@ You may need to install rocker first:
   sudo apt install python3-rocker
 ```
 - Note1: It's important to share the host's network and the `/dev/shm/` directory with the container.
-- Note2: You can add the `--home` rocker option if you want your home directory to be shared with the docker container.  Be careful though, as the host's `~/.bashrc` will be executed by the container.
+- Note2: You can add the `--home` rocker option if you want your home directory to be shared with the docker container.  Be careful though, as the host's `~/.bashrc` will be executed inside the container.
 
 ###  2.) Then, start "roscore" inside the ROS1 Noetic docker container
 
