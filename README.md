@@ -27,6 +27,7 @@ Alternative builds:
   docker build . --build-arg ADD_custom_msgs=1 -t ros-humble-ros1-bridge-builder
 ```
 - Note: Don't forget to install the necessary `ros-humble-grid-map` packages on your ROS2 Humble if you choose to build the bridge with the `grid-map` support added.
+
 - Note2: For the custom message example, there is no pre-build package for ROS2 Humble so you will need to compile it from the source.  See "Check example custom message" in the Troubleshoot section.
 
 ## How to create ros-humble-ros1-bridge package:
