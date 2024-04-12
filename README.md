@@ -27,7 +27,6 @@ Alternative builds:
   docker build . --build-arg ADD_custom_msgs=1 -t ros-humble-ros1-bridge-builder
 ```
 - Note: Don't forget to install the necessary `ros-humble-grid-map` packages on your ROS2 Humble if you choose to build the bridge with the `grid-map` support added.
-
 - Note2: For the custom message example, there is no pre-build package for ROS2 Humble so you will need to compile it from the source.  See "Check example custom message" in the Troubleshoot section.
 
 ## How to create ros-humble-ros1-bridge package:
@@ -67,8 +66,8 @@ You may need to install rocker first:
 ``` bash
   sudo apt install python3-rocker
 ```
-Note1: It's important to share the host's network and the `/dev/shm/` directory with the container.
-Note2: You can add the `--home` rocker option if you want your home directory to be shared with the docker container.  Be careful though, as the host's `~/.bashrc` will be executed by the container.
+- Note1: It's important to share the host's network and the `/dev/shm/` directory with the container.
+- Note2: You can add the `--home` rocker option if you want your home directory to be shared with the docker container.  Be careful though, as the host's `~/.bashrc` will be executed by the container.
 
 ###  2.) Then, start "roscore" inside the ROS1 Noetic docker container
 
