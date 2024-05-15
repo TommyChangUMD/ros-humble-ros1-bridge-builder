@@ -3,7 +3,7 @@ Create a "*ros-humble-ros1-bridge*" package that can be used directly within Ubu
 
 It takes approximately 10 minutes on my PC, equipped with a 6-core CPU (12 logical cores) and 24GB of memory.  
 
-Note, it takes about 1 GB of memory per CPU core to compile the ROS1 bridge. So, if your system has only 4 GB of memory but 100 CPU cores, it will still use only 4 CPU cores for the compilation. Now, why does it require so much memory to compile?  Well, you can blame the overuse of C++ templates...
+Note, it takes about 1 GB of memory per logical CPU core to compile the ROS1 bridge. So, if your system has only 4 GB of memory but 100 logical CPU cores, it will still use only 4 logical cores for the compilation. Now, why does it take so much memory to compile?  Well, you can blame the overuse of C++ templates...
 
 ## How to create this builder docker image:
 
