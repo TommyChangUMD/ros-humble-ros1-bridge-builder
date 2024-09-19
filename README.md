@@ -5,7 +5,9 @@ It takes approximately 10 minutes on my PC, equipped with a 6-core CPU (12 logic
 
 Note, it takes about 1 GB of memory per logical CPU core to compile the ROS1 bridge. So, if your system has only 4 GB of memory but 100 logical CPU cores, it will still use only 4 logical cores for the compilation. Now, why does it take so much memory to compile?  Well, you can blame the overuse of C++ templates...
 
-## How to create this builder docker image:
+NOTE: the ros noetic docker container mentioned below can be replaced by a completely separate machine running ros1 noetic e.g. Raspberry PI 4B
+
+## How to create this builder docker images:
 
 ``` bash
   git clone https://github.com/TommyChangUMD/ros-humble-ros1-bridge-builder.git
@@ -13,6 +15,9 @@ Note, it takes about 1 GB of memory per logical CPU core to compile the ROS1 bri
 
   # By default, ros-tutorals support will be built: (bridging the ros-humble-example-interfaces package)
   docker build . -t ros-humble-ros1-bridge-builder
+
+  # Build arm64 compatible ros noetic base with rospy_tutorials
+  docker build -t noetic-ros-base -f ./noetic-docker/Dockerfile .
 ```
 
 *Note: Since building the docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
@@ -59,11 +64,22 @@ Note2: We don't need the builder image anymore, to delete it, do:
 ## How to use ros-humble-ros1-bridge:
 ###  1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
 
+If using amd64 architecture:
+
 ``` bash
   rocker --x11 --user --privileged \
          --volume /dev/shm /dev/shm --network=host -- osrf/ros:noetic-desktop \
          'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
 ```
+
+or using arm64 architecture, e.g. Nvidia Jetson Orin:
+
+``` bash
+  rocker --x11 --user --privileged \
+         --volume /dev/shm /dev/shm --network=host -- noetic-ros-base \
+         'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
+```
+
 You may need to install rocker first:
 ``` bash
   sudo apt install python3-rocker
