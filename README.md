@@ -100,6 +100,8 @@ You may need to install rocker first:
   source /opt/ros/humble/setup.bash
   source ~/ros-humble-ros1-bridge/install/local_setup.bash
   ros2 run ros1_bridge dynamic_bridge
+  # or try:
+  ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
 ```
 *Note: We need to source `local_setup.bash` and NOT `setup.bash` because the bridge was compiled in a docker container that may have different underlay locations.  Besides, we don't need to source these underlays in the host system again.
 
