@@ -124,7 +124,30 @@ Also see the [troubleshoot section](#checking-example-custom-message).
 - ref: https://github.com/ros2/ros1_bridge/blob/master/doc/index.rst
 
 
+## How to make it work with ROS1 master running on a different machine?
+- Run `roscore` on the Noetic machine as usual.
+- On the Humble machine, run the bridge as below (assuming the IP address of the Noetic machine is 192.168.1.208):
+
+``` bash
+  source /opt/ros/humble/setup.bash
+  source ~/ros-humble-ros1-bridge/install/local_setup.bash
+  ROS_MASTER_URI='http://192.168.1.208:11311' ros2 run ros1_bridge dynamic_bridge
+  # Note, change "192.168.1.208" above to the IP address of your Noetic machine.
+```
+
 ## Troubleshoot
+
+### Fixing "[ERROR] Failed to contact master":
+
+If you have Noetic and Humble running on two different machines and have
+already set the ROS_MASTER_URI environment variable, you should check the
+network to ensure that the Humble machine can reach the Noetic machine via
+port 11311.
+
+``` bash
+$ nc -v -z 192.168.1.208 11311
+# Connection to 192.168.1.208 11311 port [tcp/*] succeeded!
+```
 
 ### Checking tf2 message / service:
 ``` bash
