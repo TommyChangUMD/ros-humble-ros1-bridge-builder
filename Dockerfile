@@ -7,31 +7,31 @@ FROM ros:humble-ros-base-jammy
 #
 # How to build ros-humble-ros1-bridge:
 #  # 0.) From a Ubuntu 22.04 ROS 2 Humble system, create a "ros-humble-ros1-bridge/" ROS2 package:
-#  docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
+#    docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 #
 # How to use the ros-humble-ros1-bridge:
 #  # 1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
-#  rocker --x11 --user --privileged \
-#         --volume /dev/shm /dev/shm --network=host -- osrf/ros:noetic-desktop \
-#         'bash -c "sudo apt update; sudo apt install -y tilix; tilix"'
+#    rocker --x11 --user --privileged \
+#         --volume /dev/shm /dev/shm --network=host -- ros:noetic-ros-base-focal \
+#         'bash -c "sudo apt update; sudo apt install -y ros-noetic-rospy-tutorials tilix; tilix"'
 #
 #  # 2.) Then, start "roscore" inside the ROS1 container:
-#  source /opt/ros/noetic/setup.bash
-#  roscore
+#    source /opt/ros/noetic/setup.bash
+#    roscore
 #
 #  # 3.) Now, from the Ubuntu 22.04 ROS2 Desktop Humble system, start the ros1 bridge node:
-#  apt-get -y install ros-humble-desktop
-#  source /opt/ros/humble/setup.bash
-#  source ros-humble-ros1-bridge/install/local_setup.bash
-#  ros2 run ros1_bridge dynamic_bridge
+#    apt-get -y install ros-humble-desktop
+#    source /opt/ros/humble/setup.bash
+#    source ros-humble-ros1-bridge/install/local_setup.bash
+#    ros2 run ros1_bridge dynamic_bridge
 #
 #  # 4.) Back to the ROS1 Noetic container, run in another terminal tab:
-#  source /opt/ros/noetic/setup.bash
-#  rosrun rospy_tutorials talker
+#    source /opt/ros/noetic/setup.bash
+#    rosrun rospy_tutorials talker
 #
 #  # 5.) Finally, from the Ubuntu 22.04 ROS2 Humble system:
-#  source /opt/ros/humble/setup.bash
-#  ros2 run demo_nodes_cpp listener
+#    source /opt/ros/humble/setup.bash
+#    ros2 run demo_nodes_cpp listener
 #
 
 # Make sure bash catches errors (no need to chain commands with &&, use ; instead)
@@ -189,7 +189,7 @@ RUN                                                                             
     source /opt/ros/humble/setup.bash;                                          \
     #                                                                           \
     #-------------------------------------                                      \
-    # Apply custom message / service overlays                                   \
+    # Apply additional message / service overlays                               \
     #-------------------------------------                                      \
     if [[ "$ADD_ros_tutorials" = "1" ]]; then                                   \
       # Apply ROS1 package overlay                                              \
