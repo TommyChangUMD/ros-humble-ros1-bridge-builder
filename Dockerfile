@@ -1,5 +1,6 @@
 FROM ros:humble-ros-base-jammy
-# The above base image is multi-platfrom (works on ARM64 and AMD64)
+# The above base image is multi-platform (works on ARM64 and AMD64):
+# Docker will automatically select the correct platform variant based on the host's architecture.
 
 #
 # How to build this docker image:
