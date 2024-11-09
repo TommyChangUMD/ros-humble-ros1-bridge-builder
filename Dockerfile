@@ -96,12 +96,12 @@ ARG ADD_ros_tutorials=1
 ARG ADD_grid_map=0
 
 # for a custom message example
-ARG ADD_custom_msgs=0
+ARG ADD_example_custom_msgs=0
 
 # sanity check:
-RUN echo "ADD_ros_tutorials = '$ADD_ros_tutorials'"
-RUN echo "ADD_grid_map      = '$ADD_grid_map'"
-RUN echo "ADD_custom_msgs   = '$ADD_custom_msgs'"
+RUN echo "ADD_ros_tutorials         = '$ADD_ros_tutorials'"
+RUN echo "ADD_grid_map              = '$ADD_grid_map'"
+RUN echo "ADD_example_custom_msgs   = '$ADD_example_custom_msgs'"
 
 ###########################
 # 6.1) Add additional ros_tutorials messages and services
@@ -168,7 +168,7 @@ RUN if [[ "$ADD_grid_map" = "1" ]]; then                                        
 #   Note2: Use the same package name for both ROS1 and ROS2.
 #   See https://github.com/ros2/ros1_bridge/blob/master/doc/index.rst
 ######################################
-RUN if [[ "$ADD_custom_msgs" = "1" ]]; then                             \
+RUN if [[ "$ADD_example_custom_msgs" = "1" ]]; then                     \
       git clone https://github.com/TommyChangUMD/custom_msgs.git;       \
       # Compile ROS1:                                                   \
       cd /custom_msgs/custom_msgs_ros1;                                 \
@@ -208,7 +208,7 @@ RUN                                                                             
       source /opt/ros/humble/setup.bash;                                        \
     fi;                                                                         \
     #                                                                           \
-    if [[ "$ADD_custom_msgs" = "1" ]]; then                                     \
+    if [[ "$ADD_example_custom_msgs" = "1" ]]; then                             \
       # Apply ROS1 package overlay                                              \
       source /custom_msgs/custom_msgs_ros1/install/setup.bash;                  \
       # Apply ROS2 package overlay                                              \

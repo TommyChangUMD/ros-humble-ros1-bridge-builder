@@ -29,7 +29,7 @@ Alternative builds:
   docker build . --build-arg ADD_grid_map=1 -t ros-humble-ros1-bridge-builder
 
   # **[OPTIONAL]** If you want to build an example custom message:
-  docker build . --build-arg ADD_custom_msgs=1 -t ros-humble-ros1-bridge-builder
+  docker build . --build-arg ADD_example_custom_msgs=1 -t ros-humble-ros1-bridge-builder
 ```
 - Note1: Don't forget to install the necessary `ros-humble-grid-map` packages on your ROS2 Humble if you choose to build the bridge with the `grid-map` support added.
 
@@ -94,10 +94,23 @@ You may need to install rocker first:
   source /opt/ros/humble/setup.bash
   source ~/ros-humble-ros1-bridge/install/local_setup.bash
   ros2 run ros1_bridge dynamic_bridge
-  # or try:
+  # or try (See Note2):
   ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
 ```
 - Note: We need to source `local_setup.bash` and NOT `setup.bash` because the bridge was compiled in a docker container that may have different underlay locations.  Besides, we don't need to source these underlays in the host system again.
+
+- Note2: https://github.com/ros2/ros1_bridge states that: "For efficiency reasons, topics will only be bridged when matching publisher-subscriber pairs are active for a topic on either side of the bridge. As a result **using ros2 topic echo <_topic-name_>**  doesn't work but fails with an error message Could not determine the type for the passed topic if no other subscribers are present **since the dynamic bridge hasn't bridged the topic yet**. As a **workaround** the topic type can be specified explicitly **ros2 topic echo <_topic-name_> <_topic-type_>** which triggers the bridging of the topic since the echo command represents the necessary subscriber. On the ROS 1 side rostopic echo doesn't have an option to specify the topic type explicitly. Therefore it can't be used with the dynamic bridge if no other subscribers are present. As an alternative you can use the **--bridge-all-2to1-topics option** to bridge all ROS 2 topics to ROS 1 so that tools such as rostopic echo, rostopic list and rqt will see the topics even if there are no matching ROS 1 subscribers. Run ros2 run ros1_bridge dynamic_bridge -- --help for more options."
+``` bash
+    $ ros2 run ros1_bridge dynamic_bridge --help
+    Usage:
+     -h, --help: This message.
+     --show-introspection: Print output of introspection of both sides of the bridge.
+     --print-pairs: Print a list of the supported ROS 2 <=> ROS 1 conversion pairs.
+     --bridge-all-topics: Bridge all topics in both directions, whether or not there is a matching subscriber.
+     --bridge-all-1to2-topics: Bridge all ROS 1 topics to ROS 2, whether or not there is a matching subscriber.
+     --bridge-all-2to1-topics: Bridge all ROS 2 topics to ROS 1, whether or not there is a matching subscriber.
+```
+
 
 ###  3.) Back to the ROS1 Noetic docker container, run in another terminal tab:
 
@@ -184,8 +197,8 @@ $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i grid_map
 ```
 
 ### Checking example custom message:
-- Thanks to [Codaero](https://github.com/Codaero) for the custom message source code.
-- Must have `--build-arg ADD_custom_msgs=1` added to the `docker build ...` command.
+- Thanks to [Codaero](https://github.com/Codaero) for the source code for an custom message example.
+- Must have `--build-arg ADD_example_custom_msgs=1` added to the `docker build ...` command.
 ``` bash
 # First, install the ROS2 pacakge from the source
 $ git clone https://github.com/TommyChangUMD/custom_msgs.git
