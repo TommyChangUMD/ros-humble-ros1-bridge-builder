@@ -7,7 +7,7 @@ FROM ros:humble-ros-base-jammy
 #  docker build . -t ros-humble-ros1-bridge-builder
 #
 # How to build ros-humble-ros1-bridge:
-#  # 0.) From a Ubuntu 22.04 ROS 2 Humble system, create a "ros-humble-ros1-bridge/" ROS2 package:
+#  # 0.) From a Ubuntu 22.04 (Jammy) ROS 2 Humble system, create a "ros-humble-ros1-bridge/" ROS2 package:
 #    docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
 #
 # How to use the ros-humble-ros1-bridge:
@@ -20,7 +20,7 @@ FROM ros:humble-ros-base-jammy
 #    source /opt/ros/noetic/setup.bash
 #    roscore
 #
-#  # 3.) Now, from the Ubuntu 22.04 ROS2 Desktop Humble system, start the ros1 bridge node:
+#  # 3.) Now, from the Ubuntu 22.04 (Jammy) ROS2 Desktop Humble system, start the ros1 bridge node:
 #    apt-get -y install ros-humble-desktop
 #    source /opt/ros/humble/setup.bash
 #    source ros-humble-ros1-bridge/install/local_setup.bash
@@ -30,7 +30,7 @@ FROM ros:humble-ros-base-jammy
 #    source /opt/ros/noetic/setup.bash
 #    rosrun rospy_tutorials talker
 #
-#  # 5.) Finally, from the Ubuntu 22.04 ROS2 Humble system:
+#  # 5.) Finally, from the Ubuntu 22.04 (Jammy) ROS2 Humble system:
 #    source /opt/ros/humble/setup.bash
 #    ros2 run demo_nodes_cpp listener
 #

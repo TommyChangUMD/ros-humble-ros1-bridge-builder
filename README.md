@@ -1,5 +1,5 @@
 # ros-humble-ros1-bridge-builder
-Create a "*ros-humble-ros1-bridge*" package that can be used directly within Ubuntu 22.02 ROS2 Humble. Both amd64 and arm64 architectures are supported.
+Create a "*ros-humble-ros1-bridge*" package that can be used directly within Ubuntu 22.02 (Jammy) ROS2 Humble. Both amd64 and arm64 architectures are supported.
 
 - Note1: It takes approximately 10 minutes on my PC, equipped with a 6-core CPU (12 logical cores) and 24GB of memory.
 
@@ -15,7 +15,7 @@ Create a "*ros-humble-ros1-bridge*" package that can be used directly within Ubu
   docker build . -t ros-humble-ros1-bridge-builder
 ```
 
-- Note1: Since building a docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 and it doesn't need ROS2 neither.
+- Note1: Since building a docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 (Jammy) and it doesn't need ROS2 neither.
 
 - Note2: The builder image can be created on an amd64 machine (e.g., Intel and AMD CPUs) or an arm64 machine (e.g., Raspberry Pi 4B and Nvidia Jetson Orin).  Docker will automatically select the correct platform variant based on the host's architecture.
 
@@ -36,7 +36,7 @@ Alternative builds:
 - Note2: For the custom message example, there is no pre-build package for ROS2 Humble so you will need to compile it from the source.  For details, see [Checking example custom message](#checking-example-custom-message) in the Troubleshoot section.
 
 ## How to create ros-humble-ros1-bridge package:
-###  0.) Start from the latest Ubuntu 22.04 ROS 2 Humble Desktop system, create the "ros-humble-ros1-bridge/" ROS2 package:
+###  0.) Start from the latest Ubuntu 22.04 (Jammy) ROS 2 Humble Desktop system, create the "ros-humble-ros1-bridge/" ROS2 package:
 
 ``` bash
     cd ~/
@@ -88,7 +88,7 @@ You may need to install rocker first:
   roscore
 ```
 
-###  3.) Now, from the Ubuntu 22.04 ROS2 Humble system, start the ros1 bridge node.
+###  3.) Now, from the Ubuntu 22.04 (Jammy) ROS2 Humble system, start the ros1 bridge node.
 
 ``` bash
   source /opt/ros/humble/setup.bash
@@ -119,7 +119,7 @@ You may need to install rocker first:
   rosrun rospy_tutorials talker
 ```
 
-###  4.) Finally, from the Ubuntu 22.04 ROS2 Humble system, run in another terminal tab:
+###  4.) Finally, from the Ubuntu 22.04 (Jammy) ROS2 Humble system, run in another terminal tab:
 
 ``` bash
   source /opt/ros/humble/setup.bash
