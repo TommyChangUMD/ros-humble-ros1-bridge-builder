@@ -77,6 +77,7 @@ You may need to install rocker first:
 ``` bash
   sudo apt install python3-rocker
 ```
+- Note0: Apparently, rocker will not work with the snap version of Docker, so make sure to install **docker.io** instead of installing it from the Snap Store.
 - Note1: It's important to share the host's network and the `/dev/shm/` directory with the container.
 - Note2: You can add the `--home` rocker option if you want your home directory to be shared with the docker container.  Be careful though, as the host's `~/.bashrc` will be executed inside the container.
 - Note3: You can also use **ROS1 Melodic**.  Just replace `ros:noetic-ros-base-focal` with `ros:melodic-ros-base-bionic` and also replace `ros-noetic-rospy-tutorials` with `ros-melodic-rospy-tutorials`.
