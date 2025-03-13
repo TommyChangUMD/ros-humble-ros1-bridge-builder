@@ -5,6 +5,8 @@ Create a "*ros-humble-ros1-bridge*" package that can be used directly within Ubu
 
 - Note2: It takes about 1 GB of memory per logical CPU core to compile the ROS1 bridge. So, if your system has only 4 GB of memory but 100 logical CPU cores, it will still use only 4 logical cores for the compilation. Now, why does it take so much memory to compile?  Well, you can blame the overuse of C++ templates...
 
+- Note3: If you are looking for ROS2 Jazzy + Ubuntu 24.04 support, see https://github.com/TommyChangUMD/ros-jazzy-ros1-bridge-builder
+
 ## How to create this builder docker images:
 
 ``` bash
