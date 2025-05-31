@@ -12,7 +12,7 @@ FROM ros:humble-ros-base-jammy
 #
 # How to use the ros-humble-ros1-bridge:
 #  # 1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
-#    rocker --x11 --user --privileged \
+#    rocker --x11 --user --privileged --persist-image \
 #         --volume /dev/shm /dev/shm --network=host -- ros:noetic-ros-base-focal \
 #         'bash -c "sudo apt update; sudo apt install -y ros-noetic-rospy-tutorials tilix; tilix"'
 #
@@ -76,7 +76,7 @@ RUN apt-get install -f
 ###########################
 RUN apt-get -y install ros-desktop-dev
 
-# fix ARM64 pkgconfig path issue -- Fix provided by ambrosekwok 
+# fix ARM64 pkgconfig path issue -- Fix provided by ambrosekwok
 RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then                     \
       cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/;   \
     fi
@@ -98,52 +98,53 @@ ARG ADD_grid_map=0
 # for a custom message example
 ARG ADD_example_custom_msgs=0
 
+# for octomap
+ARG ADD_octomap_msgs=0
+
 # sanity check:
 RUN echo "ADD_ros_tutorials         = '$ADD_ros_tutorials'"
 RUN echo "ADD_grid_map              = '$ADD_grid_map'"
 RUN echo "ADD_example_custom_msgs   = '$ADD_example_custom_msgs'"
+RUN echo "ADD_octomap_msgs          = '$ADD_octomap_msgs'"
 
 ###########################
-# 6.1) Add additional ros_tutorials messages and services
+# 6.1) Add ROS1 ros_tutorials messages and services
 # eg., See AddTwoInts server and client tutorial
 ###########################
-RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                           \
-      git clone https://github.com/ros/ros_tutorials.git;               \
-      cd ros_tutorials;                                                 \
-      git checkout noetic-devel;                                        \
-      unset ROS_DISTRO;                                                 \
-      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
+RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                                           \
+      git clone -b noetic-devel --depth=1 https://github.com/ros/ros_tutorials.git;     \
+      cd ros_tutorials;                                                                 \
+      unset ROS_DISTRO;                                                                 \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                        \
     fi
 
 # unit test (optional)
-RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then           \
-      cd ros_tutorials;                                 \
-      unset ROS_DISTRO;                                 \
-      colcon test --event-handlers console_direct+;     \
-      colcon test-result;                               \
-    fi
+# RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then           \
+#       cd ros_tutorials;                                 \
+#       unset ROS_DISTRO;                                 \
+#       colcon test --event-handlers console_direct+;     \
+#       colcon test-result;                               \
+#     fi
 
 ###########################
-# 6.2 Add additional grid-map messages 
+# 6.2 Add ROS1 grid-map messages
 ###########################
 # navigation stuff (just need costmap_2d?)
-RUN if [[ "$ADD_grid_map" = "1" ]]; then                        \
-      apt-get -y install libsdl1.2-dev libsdl-image1.2-dev;     \
-      git clone https://github.com/ros-planning/navigation.git; \
-      cd navigation;                                            \
-      git checkout noetic-devel;                                \
-      unset ROS_DISTRO;                                         \
-      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release \
-        --packages-select map_server voxel_grid costmap_2d;     \
+RUN if [[ "$ADD_grid_map" = "1" ]]; then                                                        \
+      apt-get -y install libsdl1.2-dev libsdl-image1.2-dev;                                     \
+      git clone -b noetic-devel --depth=1 https://github.com/ros-planning/navigation.git;       \
+      cd navigation;                                                                            \
+      unset ROS_DISTRO;                                                                         \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release                                 \
+        --packages-select map_server voxel_grid costmap_2d;                                     \
     fi
 
 # filter stuff
-RUN if [[ "$ADD_grid_map" = "1" ]]; then                                \
-      git clone https://github.com/ros/filters.git;                     \
-      cd filters;                                                       \
-      git checkout noetic-devel;                                        \
-      unset ROS_DISTRO;                                                 \
-      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
+RUN if [[ "$ADD_grid_map" = "1" ]]; then                                        \
+      git clone -b noetic-devel --depth=1 https://github.com/ros/filters.git;   \
+      cd filters;                                                               \
+      unset ROS_DISTRO;                                                         \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                \
     fi
 
 # finally grid-amp (only select a subset for now)
@@ -151,9 +152,8 @@ RUN if [[ "$ADD_grid_map" = "1" ]]; then                                        
       apt-get -y install libpcl-ros-dev libcv-bridge-dev;                               \
       source navigation/install/setup.bash;                                             \
       source filters/install/setup.bash;                                                \
-      git clone https://github.com/ANYbotics/grid_map.git;                              \
+      git clone -b 1.6.4 --depth=1 https://github.com/ANYbotics/grid_map.git;   \
       cd grid_map;                                                                      \
-      git checkout 1.6.4;                                                               \
       unset ROS_DISTRO;                                                                 \
       grep -r c++11 | grep CMakeLists | cut -f 1 -d ':' |                               \
         xargs sed -i -e 's|std=c++11|std=c++17|g';                                      \
@@ -170,65 +170,88 @@ RUN if [[ "$ADD_grid_map" = "1" ]]; then                                        
 ######################################
 RUN if [[ "$ADD_example_custom_msgs" = "1" ]]; then                     \
       git clone https://github.com/TommyChangUMD/custom_msgs.git;       \
-      # Compile ROS1:                                                   \
+      #                                                                 \
+      # Compile for ROS1:                                               \
+      #                                                                 \
       cd /custom_msgs/custom_msgs_ros1;                                 \
       unset ROS_DISTRO;                                                 \
       time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
-      # Compile ROS2:                                                   \
+      #                                                                 \
+      # Compile for ROS2:                                               \
+      #                                                                 \
       cd /custom_msgs/custom_msgs_ros2;                                 \
       source /opt/ros/humble/setup.bash;                                \
       time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;        \
     fi
 
+
+###########################
+# 6.4 Add ROS1 octomap message
+###########################
+RUN if [[ "$ADD_octomap_msgs" = "1" ]]; then                                    \
+    git clone --depth 1 -b 0.3.5 https://github.com/OctoMap/octomap_msgs.git;   \
+    cd octomap_msgs/;                                                           \
+    unset ROS_DISTRO;                                                           \
+    time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                  \
+fi
+
 ###########################
 # 7.) Compile ros1_bridge
 ###########################
-RUN                                                                             \
-    #-------------------------------------                                      \
-    # Apply the ROS2 underlay                                                   \
-    #-------------------------------------                                      \
-    source /opt/ros/humble/setup.bash;                                          \
-    #                                                                           \
-    #-------------------------------------                                      \
-    # Apply additional message / service overlays                               \
-    #-------------------------------------                                      \
-    if [[ "$ADD_ros_tutorials" = "1" ]]; then                                   \
-      # Apply ROS1 package overlay                                              \
-      source ros_tutorials/install/setup.bash;                                  \
-      # Apply ROS2 package overlay                                              \
-      apt-get -y install ros-humble-example-interfaces;                         \
-      source /opt/ros/humble/setup.bash;                                        \
-    fi;                                                                         \
-    #                                                                           \
-    if [[ "$ADD_grid_map" = "1" ]]; then                                        \
-      # Apply ROS1 package overlay                                              \
-      source grid_map/install/setup.bash;                                       \
-      # Apply ROS2 package overlay                                              \
-      apt-get -y install ros-humble-grid-map;                                   \
-      source /opt/ros/humble/setup.bash;                                        \
-    fi;                                                                         \
-    #                                                                           \
-    if [[ "$ADD_example_custom_msgs" = "1" ]]; then                             \
-      # Apply ROS1 package overlay                                              \
-      source /custom_msgs/custom_msgs_ros1/install/setup.bash;                  \
-      # Apply ROS2 package overlay                                              \
-      source /custom_msgs/custom_msgs_ros2/install/setup.bash;                  \
-    fi;                                                                         \
-    #                                                                           \
-    #-------------------------------------                                      \
-    # Finally, build the Bridge                                                 \
-    #-------------------------------------                                      \
-    mkdir -p /ros-humble-ros1-bridge/src;                                       \
-    cd /ros-humble-ros1-bridge/src;                                             \
-    git clone https://github.com/smith-doug/ros1_bridge.git;                    \
-    cd ros1_bridge/;                                                            \
-    git checkout action_bridge_humble;                                          \
-    cd ../..;                                                                   \
-    MEMG=$(printf "%.0f" $(free -g | awk '/^Mem:/{print $2}'));                 \
-    NPROC=$(nproc);  MIN=$((MEMG<NPROC ? MEMG : NPROC));                        \
-    echo "Please wait...  running $MIN concurrent jobs to build ros1_bridge";   \
-    time MAKEFLAGS="-j $MIN" colcon build --event-handlers console_direct+      \
-      --cmake-args -DCMAKE_BUILD_TYPE=Release 
+RUN                                                                                             \
+    #-------------------------------------                                                      \
+    # Apply the ROS2 underlay                                                                   \
+    #-------------------------------------                                                      \
+    source /opt/ros/humble/setup.bash;                                                          \
+    #                                                                                           \
+    #-------------------------------------                                                      \
+    # Apply additional message / service overlays                                               \
+    #-------------------------------------                                                      \
+    if [[ "$ADD_ros_tutorials" = "1" ]]; then                                                   \
+      # Apply ROS1 package overlay                                                              \
+      source ros_tutorials/install/setup.bash;                                                  \
+      # Apply ROS2 package overlay                                                              \
+      apt-get -y install ros-humble-example-interfaces;                                         \
+      source /opt/ros/humble/setup.bash;                                                        \
+    fi;                                                                                         \
+    #                                                                                           \
+    if [[ "$ADD_grid_map" = "1" ]]; then                                                        \
+      # Apply ROS1 package overlay                                                              \
+      source grid_map/install/setup.bash;                                                       \
+      # Apply ROS2 package overlay                                                              \
+      apt-get -y install ros-humble-grid-map;                                                   \
+      source /opt/ros/humble/setup.bash;                                                        \
+    fi;                                                                                         \
+    #                                                                                           \
+    if [[ "$ADD_example_custom_msgs" = "1" ]]; then                                             \
+      # Apply ROS1 package overlay                                                              \
+      source /custom_msgs/custom_msgs_ros1/install/setup.bash;                                  \
+      # Apply ROS2 package overlay                                                              \
+      source /custom_msgs/custom_msgs_ros2/install/setup.bash;                                  \
+    fi;                                                                                         \
+    #                                                                                           \
+    if [[ "$ADD_octomap_msgs" = "1" ]]; then                                                    \
+      # Apply ROS1 package overlay                                                              \
+      source octomap_msgs/install/setup.bash;                                                   \
+      # Apply ROS2 package overlay                                                              \
+      apt-get -y install ros-humble-octomap-msgs;                                               \
+      source /opt/ros/humble/setup.bash;                                                        \
+    fi;                                                                                         \
+    #                                                                                           \
+    #-------------------------------------                                                      \
+    # Finally, build the Bridge                                                                 \
+    #-------------------------------------                                                      \
+    mkdir -p /ros-humble-ros1-bridge/src;                                                       \
+    cd /ros-humble-ros1-bridge/src;                                                             \
+    git clone -b action_bridge_humble --depth=1 https://github.com/smith-doug/ros1_bridge.git;  \
+    cd ros1_bridge/;                                                                            \
+    cd ../..;                                                                                   \
+    MEMG=$(printf "%.0f" $(free -g | awk '/^Mem:/{print $2}'));                                 \
+    NPROC=$(nproc);  MIN=$((MEMG<NPROC ? MEMG : NPROC));                                        \
+    #                                                                                           \
+    echo "Please wait...  running $MIN concurrent jobs to build ros1_bridge";                   \
+    time MAKEFLAGS="-j $MIN" colcon build --event-handlers console_direct+                      \
+      --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 ###########################
 # 8.) Clean up
@@ -238,7 +261,7 @@ RUN apt-get -y clean all; apt-get -y update
 ###########################
 # 9.) Pack all ROS1 dependent libraries
 ###########################
-# fix ARM64 pkgconfig path issue -- Fix provided by ambrosekwok 
+# fix ARM64 pkgconfig path issue -- Fix provided by ambrosekwok
 RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then                    \
       cp /usr/lib/x86_64-linux-gnu/pkgconfig/* /usr/lib/aarch64-linux-gnu/pkgconfig/;  \
     fi
@@ -266,6 +289,6 @@ RUN ROS1_LIBS="libxmlrpcpp.so";                                                 
 # 10.) Spit out ros1_bridge tarball by default when no command is given
 ###########################
 RUN tar czf /ros-humble-ros1-bridge.tgz \
-     --exclude '*/build/*' --exclude '*/src/*' /ros-humble-ros1-bridge 
+     --exclude '*/build/*' --exclude '*/src/*' /ros-humble-ros1-bridge
 ENTRYPOINT []
 CMD cat /ros-humble-ros1-bridge.tgz; sync

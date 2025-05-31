@@ -32,6 +32,13 @@ Alternative builds:
 
   # **[OPTIONAL]** If you want to build an example custom message:
   docker build . --build-arg ADD_example_custom_msgs=1 -t ros-humble-ros1-bridge-builder
+
+  # **[OPTIONAL]** If you want to build octomap:
+  docker build . --build-arg ADD_octomap_msgs=1 -t ros-humble-ros1-bridge-builder
+
+  # **[OPTIONAL]** If you want to build octomap and grid-map together:
+  docker build . --build-arg ADD_octomap_msgs=1 --build-arg ADD_grid_map=1 -t ros-humble-ros1-bridge-builder
+
 ```
 - Note1: Don't forget to install the necessary `ros-humble-grid-map` packages on your ROS2 Humble if you choose to build the bridge with the `grid-map` support added.
 
@@ -68,7 +75,7 @@ Otherwise you may get an error about missing `ibexample_interfaces__rosidl_types
 ###  1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
 
 ``` bash
-  rocker --x11 --user --privileged \
+  rocker --x11 --user --privileged --persist-image \
          --volume /dev/shm /dev/shm --network=host -- ros:noetic-ros-base-focal \
          'bash -c "sudo apt update; sudo apt install -y ros-noetic-rospy-tutorials tilix; tilix"'
 ```
@@ -214,6 +221,16 @@ $ source install/setup.bash
 $ source ~/ros-humble-ros1-bridge/install/local_setup.bash
 $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i PseudoGridMap
   - 'custom_msgs/msg/PseudoGridMap' (ROS 2) <=> 'custom_msgs/PseudoGridMap' (ROS 1)
+```
+
+### Checking octomap message:
+``` bash
+$ sudo apt -y install ros-humble-octomap-msgs
+$ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i octomap
+  - 'octomap_msgs/msg/Octomap' (ROS 2) <=> 'octomap_msgs/Octomap' (ROS 1)
+  - 'octomap_msgs/msg/OctomapWithPose' (ROS 2) <=> 'octomap_msgs/OctomapWithPose' (ROS 1)
+  - 'octomap_msgs/srv/BoundingBoxQuery' (ROS 2) <=> 'octomap_msgs/BoundingBoxQuery' (ROS 1)
+  - 'octomap_msgs/srv/GetOctomap' (ROS 2) <=> 'octomap_msgs/GetOctomap' (ROS 1)
 ```
 
 
