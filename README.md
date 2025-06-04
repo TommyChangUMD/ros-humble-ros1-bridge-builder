@@ -14,7 +14,7 @@ Create a "*ros-humble-ros1-bridge*" package that can be used directly within Ubu
   cd ros-humble-ros1-bridge-builder
 
   # By default, ros-tutorals support will be built: (bridging the ros-humble-example-interfaces package)
-  docker build . -t ros-humble-ros1-bridge-builder
+  docker build . -t ros-humble-ros1-bridge-builder --network host
 ```
 
 - Note1: Since building a docker image just needs docker, you could do this step on any system that has docker installed -- it doesn't have to on a Ubuntu 22.04 (Jammy) and it doesn't need ROS2 neither.
@@ -51,7 +51,7 @@ Alternative builds:
     cd ~/
     apt update; apt upgrade
     apt -y install ros-humble-desktop
-    docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
+    docker run --network host --rm ros-humble-ros1-bridge-builder | tar xvzf -
 ```
 
 - Note1: It's **important** that you have **`ros-humble-desktop`** installed on your ROS2 Humble system because we want to **match it with the builder image as closely as possible**.  So, if you haven't done so already, do:

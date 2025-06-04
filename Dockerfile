@@ -4,11 +4,11 @@ FROM ros:humble-ros-base-jammy
 
 #
 # How to build this docker image:
-#  docker build . -t ros-humble-ros1-bridge-builder
+#  docker build . -t ros-humble-ros1-bridge-builder --network host
 #
 # How to build ros-humble-ros1-bridge:
 #  # 0.) From a Ubuntu 22.04 (Jammy) ROS 2 Humble system, create a "ros-humble-ros1-bridge/" ROS2 package:
-#    docker run --rm ros-humble-ros1-bridge-builder | tar xvzf -
+#    docker run --network host --rm ros-humble-ros1-bridge-builder | tar xvzf -
 #
 # How to use the ros-humble-ros1-bridge:
 #  # 1.) First start a ROS1 Noetic docker and bring up a GUI terminal, something like:
