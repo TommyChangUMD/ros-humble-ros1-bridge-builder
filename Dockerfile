@@ -49,7 +49,7 @@ RUN apt-get -y install ros-humble-desktop
 ###########################
 # 2.) Temporarily remove ROS2 apt repository
 ###########################
-RUN mv /etc/apt/sources.list.d/ros2-latest.list /root/
+RUN mv /etc/apt/sources.list.d/ros2.sources /root/
 RUN apt-get update
 
 ###########################
@@ -86,7 +86,7 @@ RUN if [[ $(uname -m) = "arm64" || $(uname -m) = "aarch64" ]]; then             
 #   For example, to include ROS tutorial message types, pass
 #   "--build-arg ADD_ros_tutorials=1" to the docker build command.
 ###########################
-RUN mv /root/ros2-latest.list /etc/apt/sources.list.d/
+RUN mv /root/ros2.sources /etc/apt/sources.list.d/
 RUN apt-get -y update
 
 # for ros-humble-example-interfaces:
