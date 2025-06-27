@@ -225,7 +225,8 @@ $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i PseudoGridMap
 
 ### Checking octomap message:
 - Must have `--build-arg ADD_octomap_msgs=1` added to the `docker build ...` command.
-- Note: In addition, the ROS2 Humble system must have the `ros-humble-octomap-msgs` package installed.``` bash
+- Note: In addition, the ROS2 Humble system must have the `ros-humble-octomap-msgs` package installed.
+``` bash
 $ sudo apt -y install ros-humble-octomap-msgs
 $ ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i octomap
   - 'octomap_msgs/msg/Octomap' (ROS 2) <=> 'octomap_msgs/Octomap' (ROS 1)
