@@ -116,6 +116,13 @@ RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                                   
       cd ros_tutorials;                                                                 \
       unset ROS_DISTRO;                                                                 \
       time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                        \
+      # for actionlib_tutorials \
+      cd ..; \
+      source ros_tutorials/install/setup.bash;                                                  \
+      git clone -b fuerte-devel --depth=1 https://github.com/ros/common_tutorials.git;     \
+      cd common_tutorials;                                                                 \
+      unset ROS_DISTRO;                                                                 \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                        \
     fi
 
 # unit test (optional)
@@ -210,8 +217,10 @@ RUN                                                                             
     if [[ "$ADD_ros_tutorials" = "1" ]]; then                                                   \
       # Apply ROS1 package overlay                                                              \
       source ros_tutorials/install/setup.bash;                                                  \
+      source common_tutorials/install/setup.bash;                                                  \
       # Apply ROS2 package overlay                                                              \
-      apt-get -y install ros-humble-example-interfaces;                                         \
+      apt-get -y install ros-humble-example-interfaces ros-humble-action-tutorials-interfaces;  \
+      apt-get -y install ros-humble-action-tutorials-cpp ros-humble-action-tutorials-py;        \
       source /opt/ros/humble/setup.bash;                                                        \
     fi;                                                                                         \
     #                                                                                           \
