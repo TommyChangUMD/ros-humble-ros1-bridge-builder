@@ -101,11 +101,15 @@ ARG ADD_example_custom_msgs=0
 # for octomap
 ARG ADD_octomap_msgs=0
 
+# for custom action mapping
+ARG ADD_custom_action_mapping=1
+
 # sanity check:
 RUN echo "ADD_ros_tutorials         = '$ADD_ros_tutorials'"
 RUN echo "ADD_grid_map              = '$ADD_grid_map'"
 RUN echo "ADD_example_custom_msgs   = '$ADD_example_custom_msgs'"
 RUN echo "ADD_octomap_msgs          = '$ADD_octomap_msgs'"
+RUN echo "ADD_custom_action_mapping = '$ADD_custom_action_mapping'"
 
 ###########################
 # 6.1) Add ROS1 ros_tutorials messages and services
@@ -116,11 +120,11 @@ RUN if [[ "$ADD_ros_tutorials" = "1" ]]; then                                   
       cd ros_tutorials;                                                                 \
       unset ROS_DISTRO;                                                                 \
       time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                        \
-      # for actionlib_tutorials \
-      cd ..; \
-      source ros_tutorials/install/setup.bash;                                                  \
-      git clone -b fuerte-devel --depth=1 https://github.com/ros/common_tutorials.git;     \
-      cd common_tutorials;                                                                 \
+      # for actionlib_tutorials                                                         \
+      cd ..;                                                                            \
+      source ros_tutorials/install/setup.bash;                                          \
+      git clone -b fuerte-devel --depth=1 https://github.com/ros/common_tutorials.git;  \
+      cd common_tutorials;                                                              \
       unset ROS_DISTRO;                                                                 \
       time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                        \
     fi
@@ -159,7 +163,7 @@ RUN if [[ "$ADD_grid_map" = "1" ]]; then                                        
       apt-get -y install libpcl-ros-dev libcv-bridge-dev;                               \
       source navigation/install/setup.bash;                                             \
       source filters/install/setup.bash;                                                \
-      git clone -b 1.6.4 --depth=1 https://github.com/ANYbotics/grid_map.git;   \
+      git clone -b 1.6.4 --depth=1 https://github.com/ANYbotics/grid_map.git;           \
       cd grid_map;                                                                      \
       unset ROS_DISTRO;                                                                 \
       grep -r c++11 | grep CMakeLists | cut -f 1 -d ':' |                               \
@@ -201,6 +205,32 @@ RUN if [[ "$ADD_octomap_msgs" = "1" ]]; then                                    
     unset ROS_DISTRO;                                                           \
     time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                  \
 fi
+
+###########################
+# 6.5) Example custom action mapping
+# Using YAML file for custom action mapping of control_msgs actions (code provided by Doug Smith)
+###########################
+RUN if [[ "$ADD_custom_action_mapping" = "1" ]]; then                                                          \
+      cd /;                                                                                                    \
+      # cloning the control_msgs repository for ROS1 and ROS2, which contains the action messages to be mapped.\
+      git clone --depth=1 -b kinetic-devel https://github.com/ros-controls/control_msgs.git control_msgs_ros1; \
+      cd /control_msgs_ros1;                                                                                   \
+      unset ROS_DISTRO;                                                                                        \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                                               \
+      cd /;                                                                                                    \
+      git clone --depth=1 -b humble https://github.com/ros-controls/control_msgs.git control_msgs_ros2;        \
+      cd /control_msgs_ros2;                                                                                   \
+      unset ROS_DISTRO;                                                                                        \
+      source /opt/ros/humble/setup.bash;                                                                       \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                                               \
+      # adding the custom action mapping repository, which contains the YAML file for action mapping.          \
+      mkdir -p /custom_action/src;                                                                             \
+      cd /custom_action/src;                                                                                   \
+      git clone --depth=1 https://github.com/smith-doug/bridge_mapping.git;                                    \
+      cd /custom_action;                                                                                       \
+      source /opt/ros/humble/setup.bash;                                                                       \
+      time colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release;                                               \
+    fi
 
 ###########################
 # 7.) Compile ros1_bridge
@@ -246,6 +276,12 @@ RUN                                                                             
       apt-get -y install ros-humble-octomap-msgs;                                               \
       source /opt/ros/humble/setup.bash;                                                        \
     fi;                                                                                         \
+    # Source overlays for mapping and industrial messages if present
+    if [[ "$ADD_custom_action_mapping" = "1" ]]; then \
+      source /control_msgs_ros1/install/setup.bash; \
+      source /control_msgs_ros2/install/setup.bash; \
+      source /custom_action/install/setup.bash; \
+    fi; \
     #                                                                                           \
     #-------------------------------------                                                      \
     # Finally, build the Bridge                                                                 \
