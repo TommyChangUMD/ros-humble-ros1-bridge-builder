@@ -159,6 +159,42 @@ Also see the [troubleshoot section](#checking-example-custom-message).
   # Note, change "192.168.1.208" above to the IP address of your Noetic machine.
 ```
 
+## Action Bridge Support
+
+The ros1_bridge package now supports bridging ROS 1 and ROS 2 **action** interfaces. This allows ROS 1 action servers/clients to communicate with ROS 2 action clients/servers through the bridge.
+The action bridge is built from smith-doug's [repository](https://github.com/smith-doug/ros1_bridge/tree/action_bridge_humble).
+An example custom mapping of the actions from the `control_msgs` package, using a YAML file, has been added in the dockerfile for reference.
+
+### How to Use
+
+1. **Verify available action bridges:**
+   ```bash
+   ros2 run ros1_bridge dynamic_bridge --print-pairs | grep -i action
+   ```
+2. **Using dynamic_bridge:**
+   ```bash
+   source /opt/ros/humble/setup.bash
+   source ~/ros-humble-ros1-bridge/install/local_setup.bash
+   ros2 run ros1_bridge dynamic_bridge
+   ```
+   - Start a ROS 1 action server (e.g., the custom mapped `FollowJointTrajectory` action).
+   - Use a ROS 2 action client to send a goal to the server via the bridge.
+3. **Alternatively, using action_bridge:**
+   - Alternatively, using the action_bridge node, try running the `FollowJointTrajectory` action.
+   ```bash
+   source /opt/ros/humble/setup.bash
+   source ~/ros-humble-ros1-bridge/install/local_setup.bash
+   ros2 run ros1_bridge action_bridge ros2 control_msgs action/FollowJointTrajectory joint_trajectory_action
+   ros2 run ros1_bridge action_bridge ros1 control_msgs FollowJointTrajectory joint_trajectory_action
+   ```
+   - Refer the [link](https://github.com/smith-doug/ros1_bridge/tree/action_bridge_humble?tab=readme-ov-file#action-bridge) for more info on the action_bridge command.
+
+### Notes
+
+- Action bridging requires matching action definitions in both ROS 1 and ROS 2 workspaces.
+- For more details, see [ros1_bridge action documentation](https://github.com/ros2/ros1_bridge/blob/master/doc/index.rst#action-bridging).
+
+
 ## Troubleshoot
 
 ### Fixing "[ERROR] Failed to contact master":
