@@ -50,13 +50,13 @@ Alternative builds:
 ``` bash
     cd ~/
     apt update; apt upgrade
-    apt -y install ros-humble-desktop
+    apt -y install ros-humble-desktop ros-humble-control-msgs
     docker run --network host --rm ros-humble-ros1-bridge-builder | tar xvzf -
 ```
 
-- Note1: It's **important** that you have **`ros-humble-desktop`** installed on your ROS2 Humble system because we want to **match it with the builder image as closely as possible**.  So, if you haven't done so already, do:
+- Note1: It's **important** that you have **`ros-humble-desktop`** and **`ros-humble-control-msgs`** installed on your ROS2 Humble system because we want to **match it with the builder image as closely as possible**.  So, if you haven't done so already, do:
 ``` bash
-    apt -y install ros-humble-desktop
+    apt -y install ros-humble-desktop ros-humble-control-msgs
 ```
 Otherwise you may get an error about missing `ibexample_interfaces__rosidl_typesupport_cpp.so`.  See issue https://github.com/TommyChangUMD/ros-humble-ros1-bridge-builder/issues/10
 
